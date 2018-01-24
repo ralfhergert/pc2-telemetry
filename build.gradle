@@ -1,0 +1,26 @@
+description = 'Telemetry tool for Project Cars 2'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+mainClassName = 'de.ralfhergert.telemetry.Telemetry'
+
+def detectCurrentRevision() {
+	'git log -1 --pretty=format:%H'.execute().text.trim()
+}
+
+jar {
+	from {configurations.runtime.collect {zipTree(it)}}
+	manifest {
+		attributes (
+			'Main-Class': mainClassName,
+			'Implementation-Title': 'Racing Telemetry for Project Cars 2',
+			'Implementation-Version': detectCurrentRevision()
+		)
+	}
+}
