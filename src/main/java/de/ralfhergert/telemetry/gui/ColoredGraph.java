@@ -22,7 +22,7 @@ public class ColoredGraph<Key extends Number, Value extends Number> extends Grap
 		return this;
 	}
 
-	public void setColor(Color color) {
+	public ColoredGraph<Key,Value> setColor(Color color) {
 		if (color == null) {
 			throw new IllegalArgumentException("color can not be null");
 		}
@@ -34,6 +34,7 @@ public class ColoredGraph<Key extends Number, Value extends Number> extends Grap
 				}
 			}
 		}
+		return this;
 	}
 
 	public Color getColor() {

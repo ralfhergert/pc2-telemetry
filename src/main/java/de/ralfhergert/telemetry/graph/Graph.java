@@ -24,10 +24,25 @@ public class Graph<Key extends Number, Value extends Number> {
 	}
 
 	public Graph<Key,Value> addListener(GraphListener<Key,Value> listener) {
+		if (listener == null) {
+			throw new IllegalArgumentException("listener can not be null");
+		}
 		if (!listeners.contains(listener)) {
 			listeners.add(listener);
 		}
 		return this;
+	}
+
+	public Graph<Key,Value> removeListener(GraphListener<Key,Value> listener) {
+		if (listener == null) {
+			throw new IllegalArgumentException("listener can not be null");
+		}
+		listeners.remove(listener);
+		return this;
+	}
+
+	public List<GraphListener<Key, Value>> getListeners() {
+		return new ArrayList<>(listeners); // create a copy to deny external manipulations.
 	}
 
 	public Graph<Key,Value> addValue(final GraphValue<Key,Value> value) {

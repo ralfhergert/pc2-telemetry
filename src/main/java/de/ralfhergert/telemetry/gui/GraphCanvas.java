@@ -4,6 +4,7 @@ import de.ralfhergert.telemetry.graph.Graph;
 import de.ralfhergert.telemetry.graph.GraphValue;
 
 import java.awt.geom.Path2D;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
@@ -20,17 +21,33 @@ public class GraphCanvas<Key extends Number,Value extends Number> extends JCompo
 	private int ySize = 100;
 	private DimensionChangeAdaptStyle yAdaptionStyle = DimensionChangeAdaptStyle.Scale;
 
-	private ColoredGraph<Key,Value> graph;
+	private final List<ColoredGraph<Key,Value>> graphs = new ArrayList<>();
 
 	private Color zeroLineColor = new Color(1f, 1f, 1f, 0.3f);
 
-	public GraphCanvas<Key,Value> setGraph(ColoredGraph<Key,Value> graph) {
+	public GraphCanvas<Key,Value> addGraph(ColoredGraph<Key,Value> graph) {
 		if (graph == null) {
 			throw new IllegalArgumentException("graph can not be null");
 		}
-		this.graph = graph;
-		graph.addListener(this);
+		if (!graphs.contains(graph)) {
+			graphs.add(graph);
+			graph.addListener(this);
+		}
 		return this;
+	}
+
+	public GraphCanvas<Key,Value> removeGraph(ColoredGraph<Key,Value> graph) {
+		if (graph == null) {
+			throw new IllegalArgumentException("graph can not be null");
+		}
+		if (graphs.remove(graph)) {
+			graph.removeListener(this);
+		}
+		return this;
+	}
+
+	public List<ColoredGraph<Key, Value>> getGraphs() {
+		return new ArrayList<>(graphs); // create a copy to avoid modification.
 	}
 
 	public GraphCanvas<Key,Value> setZeroLineColor(Color color) {
@@ -81,31 +98,49 @@ public class GraphCanvas<Key extends Number,Value extends Number> extends JCompo
 		g.setBackground(Color.BLACK);
 		g.clearRect(0, 0, getWidth(), getHeight());
 
-		if (graph == null || !graph.isDrawable()) {
-			return;
+		double minKey = 0;
+		double maxKey = 0;
+		double minValue = 0;
+		double maxValue = 0;
+		for (Graph graph : graphs) {
+			if (!graph.isDrawable()) {
+				continue;
+			}
+			minKey = Math.min(minKey, graph.getMinKey().doubleValue());
+			maxKey = Math.max(maxKey, graph.getMaxKey().doubleValue());
+			minValue = Math.min(minValue, graph.getMinValue().doubleValue());
+			maxValue = Math.max(maxValue, graph.getMaxValue().doubleValue());
 		}
-		final double wantedXSize = graph.getMaxKey().doubleValue() - graph.getMinKey().doubleValue();
-		final double wantedYSize = graph.getMaxValue().doubleValue() - graph.getMinValue().doubleValue();
+		final double wantedXSize = maxKey - minKey;
+		final double wantedYSize = maxValue - minValue;
+		if (wantedXSize == 0 || wantedYSize == 0) {
+			return; // nothing to draw
+		}
 		g.translate(0, getHeight());
 		g.scale(getWidth() / wantedXSize, -getHeight() / wantedYSize);
-		g.translate(0, -graph.getMinValue().doubleValue());
-
+		g.translate(0, -minValue);
 		{ // render line at y = 0
 			g.setColor(zeroLineColor);
 			g.drawLine(0, 0, getWidth(), 0);
 		}
-		g.setColor(graph.getColor());
 
-		final List<GraphValue<Key,Value>> values = graph.getValues();
-		if (values.size() < 2) {
-			return;
+		for (ColoredGraph<Key,Value> graph : graphs) {
+			if (!graph.isDrawable()) {
+				continue;
+			}
+			g.setColor(graph.getColor());
+
+			final List<GraphValue<Key,Value>> values = graph.getValues();
+			if (values.size() < 2) {
+				return;
+			}
+			Path2D path = new Path2D.Float(Path2D.WIND_NON_ZERO, values.size());
+			path.moveTo(values.get(0).getKey().floatValue(), values.get(0).getValue().floatValue());
+			for (GraphValue<Key,Value> value : values) {
+				path.lineTo(value.getKey().floatValue(), value.getValue().floatValue());
+			}
+			g.draw(path);
 		}
-		Path2D path = new Path2D.Float(Path2D.WIND_NON_ZERO, values.size());
-		path.moveTo(values.get(0).getKey().floatValue(), values.get(0).getValue().floatValue());
-		for (GraphValue<Key,Value> value : values) {
-			path.lineTo(value.getKey().floatValue(), value.getValue().floatValue());
-		}
-		g.draw(path);
 	}
 
 	@Override

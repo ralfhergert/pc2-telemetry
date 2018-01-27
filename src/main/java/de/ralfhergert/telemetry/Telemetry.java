@@ -54,8 +54,15 @@ public class Telemetry {
 			}
 		});
 
-		final ColoredGraph<Integer,Double> graph = new ColoredGraph<>(Integer::compareTo, Double::compareTo);
-		final GraphCanvas<Integer,Double> canvas = new GraphCanvas<Integer,Double>().setGraph(graph);
+		final ColoredGraph<Integer,Double> graphUnfilteredThrottle = new ColoredGraph<>(Integer::compareTo, Double::compareTo).setColor(Color.GREEN);
+		final ColoredGraph<Integer,Double> graphThrottle = new ColoredGraph<>(Integer::compareTo, Double::compareTo).setColor(new Color(0f, 1f, 0f, 0.4f));
+		final ColoredGraph<Integer,Double> graphUnfilteredBreak = new ColoredGraph<>(Integer::compareTo, Double::compareTo).setColor(Color.RED);
+		final ColoredGraph<Integer,Double> graphBreak = new ColoredGraph<>(Integer::compareTo, Double::compareTo).setColor(new Color(1f, 0f, 0f, 0.4f));
+		final GraphCanvas<Integer,Double> canvas = new GraphCanvas<Integer,Double>()
+			.addGraph(graphThrottle)
+			.addGraph(graphUnfilteredThrottle)
+			.addGraph(graphBreak)
+			.addGraph(graphUnfilteredBreak);
 
 		DatagramSocket socket = new DatagramSocket(5606);
 		new Thread(new UDPReceiver(socket, new UDPListener() {
@@ -66,7 +73,10 @@ public class Telemetry {
 					logger.info("Received unknown message: {}", new BasePackage(packet.getData()));
 				} else if (basePackage instanceof CarPhysicsPackage) {
 					CarPhysicsPackage carPhysicsPackage = (CarPhysicsPackage)basePackage;
-					graph.addValue(new GraphValue<>(graph.getValues().size(), (double)carPhysicsPackage.tyreRPS[0]));
+					graphUnfilteredThrottle.addValue(new GraphValue<>(graphUnfilteredThrottle.getValues().size(), (double)carPhysicsPackage.unfilteredThrottle));
+					graphThrottle.addValue(new GraphValue<>(graphThrottle.getValues().size(), (double)carPhysicsPackage.throttle));
+					graphUnfilteredBreak.addValue(new GraphValue<>(graphUnfilteredBreak.getValues().size(), (double)carPhysicsPackage.unfilteredBrake));
+					graphBreak.addValue(new GraphValue<>(graphBreak.getValues().size(), (double)carPhysicsPackage.brake));
 				}
 
 			}
