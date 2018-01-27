@@ -10,7 +10,7 @@ public class Graph<Key extends Number, Value extends Number> {
 	private final Comparator<Key> keyComparator;
 	private final Comparator<Value> valueComparator;
 
-	private final List<GraphListener<Key,Value>> listeners = new ArrayList<>();
+	protected final List<GraphListener<Key,Value>> listeners = new ArrayList<>();
 	private final List<GraphValue<Key,Value>> values = new ArrayList<>();
 
 	private Key minKey = null;

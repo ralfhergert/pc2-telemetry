@@ -1,7 +1,7 @@
 package de.ralfhergert.telemetry;
 
-import de.ralfhergert.telemetry.graph.Graph;
 import de.ralfhergert.telemetry.graph.GraphValue;
+import de.ralfhergert.telemetry.gui.ColoredGraph;
 import de.ralfhergert.telemetry.gui.GraphCanvas;
 import de.ralfhergert.telemetry.pc2.UDPListener;
 import de.ralfhergert.telemetry.pc2.UDPReceiver;
@@ -54,7 +54,7 @@ public class Telemetry {
 			}
 		});
 
-		final Graph<Integer,Double> graph = new Graph<>(Integer::compareTo, Double::compareTo);
+		final ColoredGraph<Integer,Double> graph = new ColoredGraph<>(Integer::compareTo, Double::compareTo);
 		final GraphCanvas<Integer,Double> canvas = new GraphCanvas<Integer,Double>().setGraph(graph);
 
 		DatagramSocket socket = new DatagramSocket(5606);

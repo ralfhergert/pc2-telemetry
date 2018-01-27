@@ -1,7 +1,6 @@
 package de.ralfhergert.telemetry.gui;
 
 import de.ralfhergert.telemetry.graph.Graph;
-import de.ralfhergert.telemetry.graph.GraphListener;
 import de.ralfhergert.telemetry.graph.GraphValue;
 
 import java.awt.geom.Path2D;
@@ -12,7 +11,7 @@ import java.awt.*;
 /**
  * Canvas component rendering a single {@link Graph}.
  */
-public class GraphCanvas<Key extends Number,Value extends Number> extends JComponent implements GraphListener<Key,Value>, Scrollable {
+public class GraphCanvas<Key extends Number,Value extends Number> extends JComponent implements ColoredGraphListener<Key,Value>, Scrollable {
 
 	private double xScale = 1;
 	private int xSize = 100;
@@ -21,32 +20,28 @@ public class GraphCanvas<Key extends Number,Value extends Number> extends JCompo
 	private int ySize = 100;
 	private DimensionChangeAdaptStyle yAdaptionStyle = DimensionChangeAdaptStyle.Scale;
 
-	private Graph<Key,Value> graph;
+	private ColoredGraph<Key,Value> graph;
 
-	private Color color = Color.WHITE;
-	private float zeroLineAlpha = 0.3f;
+	private Color zeroLineColor = new Color(1f, 1f, 1f, 0.3f);
 
-	public GraphCanvas<Key,Value> setGraph(Graph<Key,Value> graph) {
+	public GraphCanvas<Key,Value> setGraph(ColoredGraph<Key,Value> graph) {
+		if (graph == null) {
+			throw new IllegalArgumentException("graph can not be null");
+		}
 		this.graph = graph;
 		graph.addListener(this);
 		return this;
 	}
 
-	public void setColor(Color color) {
+	public GraphCanvas<Key,Value> setZeroLineColor(Color color) {
 		if (color == null) {
-			throw new IllegalArgumentException("color can not be null");
+			throw new IllegalArgumentException("zeroLineColor can not be null");
 		}
-		if (!this.color.equals(color)) {
-			this.color = color;
+		if (!this.zeroLineColor.equals(color)) {
+			this.zeroLineColor = color;
 			repaint();
 		}
-	}
-
-	public void setZeroLineAlpha(float zeroLineAlpha) {
-		if (this.zeroLineAlpha != zeroLineAlpha) {
-			this.zeroLineAlpha = zeroLineAlpha;
-			repaint();
-		}
+		return this;
 	}
 
 	@Override
@@ -75,6 +70,11 @@ public class GraphCanvas<Key extends Number,Value extends Number> extends JCompo
 	}
 
 	@Override
+	public void changedGraphColor(Graph<Key, Value> graph, Color color) {
+		repaint();
+	}
+
+	@Override
 	protected void paintComponent(Graphics graphics) {
 		Graphics2D g = (Graphics2D)graphics;
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -91,10 +91,10 @@ public class GraphCanvas<Key extends Number,Value extends Number> extends JCompo
 		g.translate(0, -graph.getMinValue().doubleValue());
 
 		{ // render line at y = 0
-			g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), (int)(256 * zeroLineAlpha)));
+			g.setColor(zeroLineColor);
 			g.drawLine(0, 0, getWidth(), 0);
 		}
-		g.setColor(color);
+		g.setColor(graph.getColor());
 
 		final List<GraphValue<Key,Value>> values = graph.getValues();
 		if (values.size() < 2) {
