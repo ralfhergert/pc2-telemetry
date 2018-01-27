@@ -81,6 +81,9 @@ public class GraphCanvas<Key extends Number,Value extends Number> extends JCompo
 		g.setBackground(Color.BLACK);
 		g.clearRect(0, 0, getWidth(), getHeight());
 
+		if (graph == null || !graph.isDrawable()) {
+			return;
+		}
 		final double wantedXSize = graph.getMaxKey().doubleValue() - graph.getMinKey().doubleValue();
 		final double wantedYSize = graph.getMaxValue().doubleValue() - graph.getMinValue().doubleValue();
 		g.translate(0, getHeight());
@@ -93,9 +96,6 @@ public class GraphCanvas<Key extends Number,Value extends Number> extends JCompo
 		}
 		g.setColor(color);
 
-		if (graph == null) {
-			return;
-		}
 		final List<GraphValue<Key,Value>> values = graph.getValues();
 		if (values.size() < 2) {
 			return;
