@@ -3,18 +3,30 @@ package de.ralfhergert.telemetry;
 import de.ralfhergert.telemetry.graph.Graph;
 import de.ralfhergert.telemetry.graph.GraphValue;
 import de.ralfhergert.telemetry.gui.GraphCanvas;
+import de.ralfhergert.telemetry.pc2.UDPListener;
+import de.ralfhergert.telemetry.pc2.UDPReceiver;
+import de.ralfhergert.telemetry.pc2.datagram.v2.BasePackage;
+import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPackage;
+import de.ralfhergert.telemetry.pc2.datagram.v2.PackageParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.Random;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 
 /**
  * Entry point into the telemetry suite.
  */
 public class Telemetry {
+
+	private static final Logger logger = LoggerFactory.getLogger(Telemetry.class);
+	private static final PackageParser parser = new PackageParser();
 
 	private final ApplicationProperties properties;
 
@@ -29,7 +41,7 @@ public class Telemetry {
 		properties.storeProperties();
 	}
 
-	public static void main(String... args) {
+	public static void main(String... args) throws IOException {
 		final Telemetry app = new Telemetry();
 
 		final JFrame frame = new JFrame("Racing Telemetry");
@@ -42,19 +54,23 @@ public class Telemetry {
 			}
 		});
 
-		final Graph<Integer,Integer> graph = new Graph<>(Integer::compareTo, Integer::compareTo);
-		final GraphCanvas<Integer,Integer> canvas = new GraphCanvas<Integer,Integer>().setGraph(graph);
+		final Graph<Integer,Double> graph = new Graph<>(Integer::compareTo, Double::compareTo);
+		final GraphCanvas<Integer,Double> canvas = new GraphCanvas<Integer,Double>().setGraph(graph);
 
-		final Random random = new Random();
-
-		new Thread() {
+		DatagramSocket socket = new DatagramSocket(5606);
+		new Thread(new UDPReceiver(socket, new UDPListener() {
 			@Override
-			public void run() {
-				for (int i = 0; i < 800; i++) {
-					graph.addValue(new GraphValue<>(i, random.nextInt(200)));
+			public void received(DatagramPacket packet) {
+				BasePackage basePackage = parser.parse(packet);
+				if (basePackage == null) {
+					logger.info("Received unknown message: {}", new BasePackage(packet.getData()));
+				} else if (basePackage instanceof CarPhysicsPackage) {
+					CarPhysicsPackage carPhysicsPackage = (CarPhysicsPackage)basePackage;
+					graph.addValue(new GraphValue<>(graph.getValues().size(), (double)carPhysicsPackage.tyreRPS[0]));
 				}
+
 			}
-		}.start();
+		})).start();
 
 		frame.getContentPane().add(new JScrollPane(canvas), BorderLayout.CENTER);
 		frame.setSize(720,480);
