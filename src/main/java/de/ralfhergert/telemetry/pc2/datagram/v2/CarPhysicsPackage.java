@@ -4,6 +4,8 @@ import de.ralfhergert.telemetry.pc2.datagram.*;
 
 /**
  * Holds the data of a single CarPhysics package.
+ * @see <a href="https://www.projectcarsgame.com/project-cars-2-api.html"></a>
+ * @see <a href="https://www.projectcarsgame.com/uploads/2/0/6/5/20658008/sms_udp_definitions.hpp">UDP Patch 3</a>
  */
 public class CarPhysicsPackage extends BasePackage {
 
