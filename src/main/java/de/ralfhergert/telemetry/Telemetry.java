@@ -1,13 +1,14 @@
 package de.ralfhergert.telemetry;
 
-import de.ralfhergert.telemetry.graph.GraphValue;
-import de.ralfhergert.telemetry.gui.ColoredGraph;
+import de.ralfhergert.telemetry.graph.NegativeOffsetAccessor;
+import de.ralfhergert.telemetry.gui.ColoredLineGraph;
 import de.ralfhergert.telemetry.gui.GraphCanvas;
 import de.ralfhergert.telemetry.pc2.UDPListener;
 import de.ralfhergert.telemetry.pc2.UDPReceiver;
 import de.ralfhergert.telemetry.pc2.datagram.v2.BasePackage;
 import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPackage;
 import de.ralfhergert.telemetry.pc2.datagram.v2.PackageParser;
+import de.ralfhergert.telemetry.repository.IndexedRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Comparator;
 
 /**
  * Entry point into the telemetry suite.
@@ -54,14 +56,24 @@ public class Telemetry {
 			}
 		});
 
-		final ColoredGraph<Integer,Double> graphUnfilteredThrottle = new ColoredGraph<>(Integer::compareTo, Double::compareTo).setColor(Color.GREEN);
-		final ColoredGraph<Integer,Double> graphThrottle = new ColoredGraph<>(Integer::compareTo, Double::compareTo).setColor(new Color(0f, 1f, 0f, 0.4f));
-		final ColoredGraph<Integer,Double> graphUnfilteredBreak = new ColoredGraph<>(Integer::compareTo, Double::compareTo).setColor(Color.RED);
-		final ColoredGraph<Integer,Double> graphBreak = new ColoredGraph<>(Integer::compareTo, Double::compareTo).setColor(new Color(1f, 0f, 0f, 0.4f));
-		final GraphCanvas<Integer,Double> canvas = new GraphCanvas<Integer,Double>()
+		final IndexedRepository<CarPhysicsPackage> carPhysicRepository = new IndexedRepository<>((Comparator<CarPhysicsPackage>)
+			(o1, o2) -> o1.getReceivedDate().compareTo(o2.getReceivedDate())
+		);
+
+		final NegativeOffsetAccessor<CarPhysicsPackage, Long> timeStampAccessor = (carPhysicsPackage, offset) -> {
+            long timestamp = carPhysicsPackage.getReceivedDate().getTime();
+            return (offset == null) ? timestamp : timestamp - offset;
+        };
+
+		final ColoredLineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredThrottle = new ColoredLineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.unfilteredThrottle).setColor(Color.GREEN);
+		final ColoredLineGraph<CarPhysicsPackage, Long, Short> graphThrottle = new ColoredLineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.throttle).setColor(new Color(0f, 1f, 0f, 0.4f));
+		final ColoredLineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredBreak = new ColoredLineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.unfilteredBrake).setColor(Color.RED);
+		final ColoredLineGraph<CarPhysicsPackage, Long, Short> graphBrake = new ColoredLineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.brake).setColor(new Color(1f, 0f, 0f, 0.4f));
+
+		final GraphCanvas<CarPhysicsPackage, Long, Short> canvas = new GraphCanvas<CarPhysicsPackage,Long,Short>()
 			.addGraph(graphThrottle)
 			.addGraph(graphUnfilteredThrottle)
-			.addGraph(graphBreak)
+			.addGraph(graphBrake)
 			.addGraph(graphUnfilteredBreak);
 
 		DatagramSocket socket = new DatagramSocket(5606);
@@ -73,12 +85,8 @@ public class Telemetry {
 					logger.info("Received unknown message: {}", new BasePackage(packet.getData()));
 				} else if (basePackage instanceof CarPhysicsPackage) {
 					CarPhysicsPackage carPhysicsPackage = (CarPhysicsPackage)basePackage;
-					graphUnfilteredThrottle.addValue(new GraphValue<>(graphUnfilteredThrottle.getValues().size(), (double)carPhysicsPackage.unfilteredThrottle));
-					graphThrottle.addValue(new GraphValue<>(graphThrottle.getValues().size(), (double)carPhysicsPackage.throttle));
-					graphUnfilteredBreak.addValue(new GraphValue<>(graphUnfilteredBreak.getValues().size(), (double)carPhysicsPackage.unfilteredBrake));
-					graphBreak.addValue(new GraphValue<>(graphBreak.getValues().size(), (double)carPhysicsPackage.brake));
+					carPhysicRepository.addItem(carPhysicsPackage);
 				}
-
 			}
 		})).start();
 

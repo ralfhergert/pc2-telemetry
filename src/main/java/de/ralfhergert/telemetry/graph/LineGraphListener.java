@@ -5,5 +5,5 @@ package de.ralfhergert.telemetry.graph;
  */
 public interface LineGraphListener<Item, Key extends Number, Value extends Number> {
 
-	void graphChanged(LineGraph<Item, Key, Value> graph, boolean boundariesChanged);
+	void graphChanged(LineGraph<Item, Key, Value> graph);
 }

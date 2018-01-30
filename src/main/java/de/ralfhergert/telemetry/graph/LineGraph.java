@@ -13,20 +13,16 @@ import java.util.List;
  */
 public class LineGraph<Item, Key extends Number, Value extends Number> implements RepositoryListener<Item> {
 
-	private final Accessor<Item, Key> keyAccessor;
+	private final NegativeOffsetAccessor<Item, Key> keyAccessor;
 	private final Accessor<Item, Value> valueAccessor;
 
 	private Path2D path = new Path2D.Double();
 
 	protected final List<LineGraphListener<Item, Key,Value>> listeners = new ArrayList<>();
-	private final List<GraphValue<Key,Value>> values = new ArrayList<>();
 
 	private Key minKey = null;
-	private Key maxKey = null;
-	private Value minValue = null;
-	private Value maxValue = null;
 
-	public LineGraph(IndexedRepository<Item> repository, Accessor<Item, Key> keyAccessor, Accessor<Item, Value> valueAccessor) {
+	public LineGraph(IndexedRepository<Item> repository, NegativeOffsetAccessor<Item, Key> keyAccessor, Accessor<Item, Value> valueAccessor) {
 		if (repository == null) {
 			throw new IllegalArgumentException("repository can not be null");
 		}
@@ -46,13 +42,14 @@ public class LineGraph<Item, Key extends Number, Value extends Number> implement
 	public void onItemAdded(Repository<Item> repository, Item item, Item itemBefore, Item itemAfter) {
 		if (itemBefore == null && itemAfter == null) { // start a new path
 			path = new Path2D.Double();
-			path.moveTo(keyAccessor.getValue(item).doubleValue(), valueAccessor.getValue(item).doubleValue());
+			minKey = keyAccessor.getValueWithNegOffset(item, null);
+			path.moveTo(keyAccessor.getValueWithNegOffset(item, minKey).doubleValue(), valueAccessor.getValue(item).doubleValue());
 		} else if (itemAfter == null) {
-			path.lineTo(keyAccessor.getValue(item).doubleValue(), valueAccessor.getValue(item).doubleValue());
+			path.lineTo(keyAccessor.getValueWithNegOffset(item, minKey).doubleValue(), valueAccessor.getValue(item).doubleValue());
 		} else {
 			redrawPath(repository);
 		}
-		listeners.forEach(listener -> listener.graphChanged(this, true));
+		listeners.forEach(listener -> listener.graphChanged(this));
 	}
 
 	@Override
@@ -62,40 +59,13 @@ public class LineGraph<Item, Key extends Number, Value extends Number> implement
 
 	protected void redrawPath(Repository<Item> repository) {
 		path = new Path2D.Double();
-		repository.getItemStream().findFirst().ifPresent(item ->
-			path.moveTo(keyAccessor.getValue(item).doubleValue(), valueAccessor.getValue(item).doubleValue())
-		);
+		repository.getItemStream().findFirst().ifPresent(item -> {
+			minKey = keyAccessor.getValueWithNegOffset(item, null);
+			path.moveTo(keyAccessor.getValueWithNegOffset(item, minKey).doubleValue(), valueAccessor.getValue(item).doubleValue());
+		});
 		repository.getItemStream().forEach(item ->
-			path.lineTo(keyAccessor.getValue(item).doubleValue(), valueAccessor.getValue(item).doubleValue())
+			path.lineTo(keyAccessor.getValueWithNegOffset(item, minKey).doubleValue(), valueAccessor.getValue(item).doubleValue())
 		);
-	}
-
-	protected boolean updateBoundaries(Item item) {
-		boolean keyDimensionChanged = false;
-		final Key key = keyAccessor.getValue(item);
-		if (key != null) {
-			if (minKey == null || key.doubleValue() < minKey.doubleValue()) {
-				minKey = key;
-				keyDimensionChanged = true;
-			}
-			if (maxKey == null || key.doubleValue() > maxKey.doubleValue()) {
-				maxKey = key;
-				keyDimensionChanged = true;
-			}
-		}
-		boolean valueDimensionChanged = false;
-		final Value value = valueAccessor.getValue(item);
-		if (value != null) {
-			if (minValue == null || value.doubleValue() < minValue.doubleValue()) {
-				minValue = value;
-				valueDimensionChanged = true;
-			}
-			if (maxValue == null || value.doubleValue() > maxValue.doubleValue()) {
-				maxValue = value;
-				valueDimensionChanged = true;
-			}
-		}
-		return keyDimensionChanged || valueDimensionChanged;
 	}
 
 	public LineGraph<Item, Key,Value> addListener(LineGraphListener<Item, Key,Value> listener) {
@@ -118,5 +88,9 @@ public class LineGraph<Item, Key extends Number, Value extends Number> implement
 
 	public List<LineGraphListener<Item, Key, Value>> getListeners() {
 		return new ArrayList<>(listeners); // create a copy to deny external manipulations.
+	}
+
+	public Path2D getPath() {
+		return path;
 	}
 }

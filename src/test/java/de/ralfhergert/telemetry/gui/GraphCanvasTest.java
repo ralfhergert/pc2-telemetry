@@ -1,5 +1,6 @@
 package de.ralfhergert.telemetry.gui;
 
+import de.ralfhergert.telemetry.repository.IndexedRepository;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,8 +17,8 @@ public class GraphCanvasTest {
 
 	@Test
 	public void testOnAddingGraphTheGraphCanvasRegistersItselfAsListener() {
-		ColoredGraph<Integer,Integer> graph = new ColoredGraph<>(Integer::compareTo, Integer::compareTo);
-		GraphCanvas<Integer,Integer> canvas = new GraphCanvas<Integer,Integer>().addGraph(graph);
+		ColoredLineGraph<Object,Integer,Integer> graph = new ColoredLineGraph<>(new IndexedRepository<>(null), (t,o) -> null, (t) -> null);
+		GraphCanvas<Object,Integer,Integer> canvas = new GraphCanvas<Object,Integer,Integer>().addGraph(graph);
 		Assert.assertEquals("number of listeners on the graph", 1, graph.getListeners().size());
 		/* This assertion is ok for now, but technically the canvas can also use an internally created listener.
 		 * The correct check would be to confirm that the canvas is informed when changes on the graph happen. */
@@ -26,8 +27,8 @@ public class GraphCanvasTest {
 
 	@Test
 	public void testOnRemovingGraphTheGraphCanvasUnregistersItselfAsListener() {
-		ColoredGraph<Integer,Integer> graph = new ColoredGraph<>(Integer::compareTo, Integer::compareTo);
-		GraphCanvas<Integer,Integer> canvas = new GraphCanvas<Integer,Integer>().addGraph(graph);
+		ColoredLineGraph<Object,Integer,Integer> graph = new ColoredLineGraph<>(new IndexedRepository<>(null), (t,o) -> null, (o) -> null);
+		GraphCanvas<Object,Integer,Integer> canvas = new GraphCanvas<Object,Integer,Integer>().addGraph(graph);
 		/**
 		 * This test does not retest whether the canvas registers itself correctly as a listener,
 		 * because this is already tested by {@link testOnAddingGraphTheGraphCanvasRegistersItselfAsListener()}

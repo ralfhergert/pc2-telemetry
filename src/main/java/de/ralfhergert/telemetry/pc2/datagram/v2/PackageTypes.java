@@ -14,4 +14,4 @@ public enum PackageTypes {
 	VehicleNames, //not sent at the moment
 	TimeStats,
 	ParticipantVehicleNames
-};
+}
