@@ -3,6 +3,8 @@ package de.ralfhergert.telemetry.gui;
 import de.ralfhergert.telemetry.graph.Graph;
 import de.ralfhergert.telemetry.graph.LineGraph;
 
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,18 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 	private final List<ColoredLineGraph<Item, Key,Value>> graphs = new ArrayList<>();
 
 	private Color zeroLineColor = new Color(1f, 1f, 1f, 0.3f);
+
+	public GraphCanvas() {
+		addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if (e.isControlDown()) {
+					xScale *= Math.pow(1.5, e.getWheelRotation());
+					revalidate();
+				}
+			}
+		});
+	}
 
 	public GraphCanvas<Item, Key, Value> addGraph(ColoredLineGraph<Item, Key, Value> graph) {
 		if (graph == null) {
@@ -61,7 +75,7 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 
 	@Override
 	public void graphChanged(LineGraph graph) {
-		invalidate();
+		revalidate();
 		repaint();
 	}
 
