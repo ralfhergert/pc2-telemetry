@@ -83,7 +83,7 @@ public class CarPhysicsPackage extends BasePackage {
 
 	public CarPhysicsPackage(byte[] data) {
 		super(data);
-		if (data.length < 538) {
+		if (data.length < 556) {
 			throw new IllegalArgumentException("given data array is too short to be read as CarPhysicsPackage");
 		}
 		if (getPacketType() != PackageTypes.CarPhysics || getPacketVersion() != 2) {
