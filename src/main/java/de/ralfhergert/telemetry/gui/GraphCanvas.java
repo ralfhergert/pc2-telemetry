@@ -1,6 +1,7 @@
 package de.ralfhergert.telemetry.gui;
 
 import de.ralfhergert.telemetry.graph.LineGraph;
+import de.ralfhergert.telemetry.graph.LineGraphListener;
 
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -13,14 +14,14 @@ import java.awt.*;
 /**
  * Canvas component rendering multiple {@link LineGraph}.
  */
-public class GraphCanvas<Item, Key extends Number,Value extends Number> extends JComponent implements ColoredLineGraphListener<Item,Key,Value>, Scrollable {
+public class GraphCanvas<Item, Key extends Number,Value extends Number> extends JComponent implements LineGraphListener<Item,Key,Value>, Scrollable {
 
 	private double xScale = 0.2;
 	private DimensionChangeAdaptStyle xAdaptionStyle = DimensionChangeAdaptStyle.Size;
 	private double yScale = 1;
 	private DimensionChangeAdaptStyle yAdaptionStyle = DimensionChangeAdaptStyle.Scale;
 
-	private final List<ColoredLineGraph<Item, Key,Value>> graphs = new ArrayList<>();
+	private final List<LineGraph<Item, Key,Value>> graphs = new ArrayList<>();
 
 	private Color zeroLineColor = new Color(1f, 1f, 1f, 0.3f);
 
@@ -36,18 +37,19 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 		});
 	}
 
-	public GraphCanvas<Item, Key, Value> addGraph(ColoredLineGraph<Item, Key, Value> graph) {
+	public GraphCanvas<Item, Key, Value> addGraph(LineGraph<Item, Key, Value> graph) {
 		if (graph == null) {
 			throw new IllegalArgumentException("graph can not be null");
 		}
 		if (!graphs.contains(graph)) {
 			graphs.add(graph);
 			graph.addListener(this);
+			graph.getPropertyValues().ensureProperty("color", Color.WHITE, (p,o,n) -> this.repaint());
 		}
 		return this;
 	}
 
-	public GraphCanvas<Item, Key,Value> removeGraph(ColoredLineGraph<Item, Key,Value> graph) {
+	public GraphCanvas<Item, Key,Value> removeGraph(LineGraph<Item, Key,Value> graph) {
 		if (graph == null) {
 			throw new IllegalArgumentException("graph can not be null");
 		}
@@ -57,7 +59,7 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 		return this;
 	}
 
-	public List<ColoredLineGraph<Item, Key, Value>> getGraphs() {
+	public List<LineGraph<Item, Key, Value>> getGraphs() {
 		return new ArrayList<>(graphs); // create a copy to avoid modification.
 	}
 
@@ -75,11 +77,6 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 	@Override
 	public void graphChanged(LineGraph graph) {
 		revalidate();
-		repaint();
-	}
-
-	@Override
-	public void changedGraphColor(LineGraph graph, Color color) {
 		repaint();
 	}
 
@@ -117,12 +114,12 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 			g.drawLine(0, 0, getWidth(), 0);
 		}
 
-		for (ColoredLineGraph<Item, Key,Value> graph : graphs) {
+		for (LineGraph<Item, Key,Value> graph : graphs) {
 			Path2D path = graph.getPath();
 			if (path == null) {
 				continue;
 			}
-			g.setColor(graph.getColor());
+			g.setColor(graph.getProperty("color", Color.WHITE));
 			g.draw(path);
 		}
 	}

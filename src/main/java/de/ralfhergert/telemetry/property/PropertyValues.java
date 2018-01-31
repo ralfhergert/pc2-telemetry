@@ -17,11 +17,15 @@ public class PropertyValues {
 	 * and the listener is registered.
 	 */
 	public <Type> PropertyValues ensureProperty(String propertyName, Type defaultValue, PropertyValueListener<Type> listener) {
-		PropertyValue propertyValue = propertyValueMap.get(propertyName);
+		PropertyValue<Type> propertyValue = (PropertyValue<Type>)propertyValueMap.get(propertyName);
 		if (propertyValue != null) {
 			propertyValue.addListener(listener);
 		} else {
-			propertyValueMap.put(propertyName, new PropertyValue<>(defaultValue).addListener(listener));
+			propertyValue = new PropertyValue<>(defaultValue);
+			if (listener != null) {
+				propertyValue.addListener(listener);
+			}
+			propertyValueMap.put(propertyName, propertyValue);
 		}
 		return this;
 	}

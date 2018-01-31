@@ -1,5 +1,6 @@
 package de.ralfhergert.telemetry.gui;
 
+import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.repository.IndexedRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +18,7 @@ public class GraphCanvasTest {
 
 	@Test
 	public void testOnAddingGraphTheGraphCanvasRegistersItselfAsListener() {
-		ColoredLineGraph<Object,Integer,Integer> graph = new ColoredLineGraph<>(new IndexedRepository<>(null), (t,o) -> null, (t) -> null);
+		LineGraph<Object,Integer,Integer> graph = new LineGraph<>(new IndexedRepository<>(null), (t, o) -> null, (t) -> null);
 		GraphCanvas<Object,Integer,Integer> canvas = new GraphCanvas<Object,Integer,Integer>().addGraph(graph);
 		Assert.assertEquals("number of listeners on the graph", 1, graph.getListeners().size());
 		/* This assertion is ok for now, but technically the canvas can also use an internally created listener.
@@ -27,7 +28,7 @@ public class GraphCanvasTest {
 
 	@Test
 	public void testOnRemovingGraphTheGraphCanvasUnregistersItselfAsListener() {
-		ColoredLineGraph<Object,Integer,Integer> graph = new ColoredLineGraph<>(new IndexedRepository<>(null), (t,o) -> null, (o) -> null);
+		LineGraph<Object,Integer,Integer> graph = new LineGraph<>(new IndexedRepository<>(null), (t,o) -> null, (o) -> null);
 		GraphCanvas<Object,Integer,Integer> canvas = new GraphCanvas<Object,Integer,Integer>().addGraph(graph);
 		/**
 		 * This test does not retest whether the canvas registers itself correctly as a listener,

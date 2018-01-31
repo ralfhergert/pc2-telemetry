@@ -1,7 +1,7 @@
 package de.ralfhergert.telemetry;
 
+import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.graph.NegativeOffsetAccessor;
-import de.ralfhergert.telemetry.gui.ColoredLineGraph;
 import de.ralfhergert.telemetry.gui.GraphCanvas;
 import de.ralfhergert.telemetry.pc2.UDPListener;
 import de.ralfhergert.telemetry.pc2.UDPReceiver;
@@ -65,10 +65,10 @@ public class Telemetry {
             return (offset == null) ? timestamp : timestamp - offset;
         };
 
-		final ColoredLineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredThrottle = new ColoredLineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.unfilteredThrottle).setColor(Color.GREEN);
-		final ColoredLineGraph<CarPhysicsPackage, Long, Short> graphThrottle = new ColoredLineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.throttle).setColor(new Color(0f, 1f, 0f, 0.4f));
-		final ColoredLineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredBreak = new ColoredLineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.unfilteredBrake).setColor(Color.RED);
-		final ColoredLineGraph<CarPhysicsPackage, Long, Short> graphBrake = new ColoredLineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.brake).setColor(new Color(1f, 0f, 0f, 0.4f));
+		final LineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredThrottle = new LineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.unfilteredThrottle).setProperty("color", Color.GREEN);
+		final LineGraph<CarPhysicsPackage, Long, Short> graphThrottle = new LineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.throttle).setProperty("color", new Color(0f, 1f, 0f, 0.4f));
+		final LineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredBreak = new LineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.unfilteredBrake).setProperty("color", Color.RED);
+		final LineGraph<CarPhysicsPackage, Long, Short> graphBrake = new LineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.brake).setProperty("color", new Color(1f, 0f, 0f, 0.4f));
 
 		final GraphCanvas<CarPhysicsPackage, Long, Short> canvas = new GraphCanvas<CarPhysicsPackage,Long,Short>()
 			.addGraph(graphThrottle)

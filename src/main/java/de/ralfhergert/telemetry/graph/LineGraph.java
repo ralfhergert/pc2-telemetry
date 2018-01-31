@@ -1,5 +1,6 @@
 package de.ralfhergert.telemetry.graph;
 
+import de.ralfhergert.telemetry.property.PropertyValues;
 import de.ralfhergert.telemetry.repository.IndexedRepository;
 import de.ralfhergert.telemetry.repository.Repository;
 import de.ralfhergert.telemetry.repository.RepositoryListener;
@@ -19,6 +20,7 @@ public class LineGraph<Item, Key extends Number, Value extends Number> implement
 	private Path2D path = new Path2D.Double();
 
 	protected final List<LineGraphListener<Item, Key,Value>> listeners = new ArrayList<>();
+	private final PropertyValues propertyValues = new PropertyValues();
 
 	private Key minKey = null;
 
@@ -92,5 +94,18 @@ public class LineGraph<Item, Key extends Number, Value extends Number> implement
 
 	public Path2D getPath() {
 		return path;
+	}
+
+	public PropertyValues getPropertyValues() {
+		return propertyValues;
+	}
+
+	public <Type> LineGraph<Item, Key, Value> setProperty(final String propertyName, Type value) {
+		propertyValues.ensureProperty(propertyName, value, null);
+		return this;
+	}
+
+	public <Type> Type getProperty(final String propertyName, Type defaultValue) {
+		return propertyValues.getValue(propertyName, defaultValue);
 	}
 }
