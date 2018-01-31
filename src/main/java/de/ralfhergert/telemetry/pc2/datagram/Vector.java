@@ -10,4 +10,8 @@ public class Vector {
 	public Vector(float... values) {
 		this.values = values;
 	}
+
+	public float get(int index) {
+		return values[index];
+	}
 }
