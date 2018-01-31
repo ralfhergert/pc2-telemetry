@@ -1,6 +1,5 @@
 package de.ralfhergert.telemetry.gui;
 
-import de.ralfhergert.telemetry.graph.Graph;
 import de.ralfhergert.telemetry.graph.LineGraph;
 
 import java.awt.event.MouseWheelEvent;
@@ -12,7 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Canvas component rendering a single {@link Graph}.
+ * Canvas component rendering multiple {@link LineGraph}.
  */
 public class GraphCanvas<Item, Key extends Number,Value extends Number> extends JComponent implements ColoredLineGraphListener<Item,Key,Value>, Scrollable {
 
