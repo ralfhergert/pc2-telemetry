@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ResourceBundle;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
@@ -25,7 +26,7 @@ public class SaveCurrentRepository extends AbstractAction {
 	private Component parent;
 
 	public SaveCurrentRepository(Telemetry application, Component parent) {
-		super("Save current data...");
+		super(ResourceBundle.getBundle("messages").getString("action.saveCurrentRepository.caption"));
 		this.application = application;
 		this.parent = parent;
 	}
@@ -45,7 +46,7 @@ public class SaveCurrentRepository extends AbstractAction {
 
 			@Override
 			public String getDescription() {
-				return "PC2-Telemetry Data (*.pc2td)";
+				return ResourceBundle.getBundle("messages").getString("fileName.pc2td.caption");
 			}
 		});
 		fileChooser.setSelectedFile(new File("capture.pc2td"));
