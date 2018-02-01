@@ -14,12 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.Comparator;
 
 /**
@@ -32,36 +31,27 @@ public class Telemetry {
 
 	private final ApplicationProperties properties;
 
-	public Telemetry() {
+	private IndexedRepository<CarPhysicsPackage> currentRepository;
+	private GraphCanvas<CarPhysicsPackage, Long, Short> graphCanvas;
+
+	public Telemetry() throws SocketException {
 		properties = new ApplicationProperties(new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".PC2Telemetry", "defaults.ini"));
-	}
 
-	/**
-	 * This method performs last operation when shutting down the app.
-	 */
-	public void shutdown() {
-		properties.storeProperties();
-	}
-
-	public static void main(String... args) throws IOException {
-		final Telemetry app = new Telemetry();
-		final TelemetryFrame frame = new TelemetryFrame(app);
-
-		final IndexedRepository<CarPhysicsPackage> carPhysicRepository = new IndexedRepository<>((Comparator<CarPhysicsPackage>)
+		currentRepository = new IndexedRepository<>((Comparator<CarPhysicsPackage>)
 			(o1, o2) -> o1.getReceivedDate().compareTo(o2.getReceivedDate())
 		);
 
 		final NegativeOffsetAccessor<CarPhysicsPackage, Long> timeStampAccessor = (carPhysicsPackage, offset) -> {
-            long timestamp = carPhysicsPackage.getReceivedDate().getTime();
-            return (offset == null) ? timestamp : timestamp - offset;
-        };
+			long timestamp = carPhysicsPackage.getReceivedDate().getTime();
+			return (offset == null) ? timestamp : timestamp - offset;
+		};
 
-		final LineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredThrottle = new LineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.unfilteredThrottle).setProperty("color", Color.GREEN);
-		final LineGraph<CarPhysicsPackage, Long, Short> graphThrottle = new LineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.throttle).setProperty("color", new Color(0f, 1f, 0f, 0.4f));
-		final LineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredBreak = new LineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.unfilteredBrake).setProperty("color", Color.RED);
-		final LineGraph<CarPhysicsPackage, Long, Short> graphBrake = new LineGraph<>(carPhysicRepository, timeStampAccessor, (p) -> p.brake).setProperty("color", new Color(1f, 0f, 0f, 0.4f));
+		final LineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredThrottle = new LineGraph<>(currentRepository, timeStampAccessor, (p) -> p.unfilteredThrottle).setProperty("color", Color.GREEN);
+		final LineGraph<CarPhysicsPackage, Long, Short> graphThrottle = new LineGraph<>(currentRepository, timeStampAccessor, (p) -> p.throttle).setProperty("color", new Color(0f, 1f, 0f, 0.4f));
+		final LineGraph<CarPhysicsPackage, Long, Short> graphUnfilteredBreak = new LineGraph<>(currentRepository, timeStampAccessor, (p) -> p.unfilteredBrake).setProperty("color", Color.RED);
+		final LineGraph<CarPhysicsPackage, Long, Short> graphBrake = new LineGraph<>(currentRepository, timeStampAccessor, (p) -> p.brake).setProperty("color", new Color(1f, 0f, 0f, 0.4f));
 
-		final GraphCanvas<CarPhysicsPackage, Long, Short> canvas = new GraphCanvas<CarPhysicsPackage,Long,Short>()
+		graphCanvas = new GraphCanvas<CarPhysicsPackage,Long,Short>()
 			.addGraph(graphThrottle)
 			.addGraph(graphUnfilteredThrottle)
 			.addGraph(graphBrake)
@@ -76,12 +66,32 @@ public class Telemetry {
 					logger.info("Received unknown message: {}", new BasePackage(packet.getData()));
 				} else if (basePackage instanceof CarPhysicsPackage) {
 					CarPhysicsPackage carPhysicsPackage = (CarPhysicsPackage)basePackage;
-					carPhysicRepository.addItem(carPhysicsPackage);
+					currentRepository.addItem(carPhysicsPackage);
 				}
 			}
 		})).start();
+	}
 
-		frame.getContentPane().add(new JScrollPane(canvas), BorderLayout.CENTER);
+	public IndexedRepository<CarPhysicsPackage> getCurrentRepository() {
+		return currentRepository;
+	}
+
+	public GraphCanvas<CarPhysicsPackage, Long, Short> getGraphCanvas() {
+		return graphCanvas;
+	}
+
+	/**
+	 * This method performs last operation when shutting down the app.
+	 */
+	public void shutdown() {
+		properties.storeProperties();
+	}
+
+	public static void main(String... args) throws IOException {
+		final Telemetry app = new Telemetry();
+		final TelemetryFrame frame = new TelemetryFrame(app);
+
+		frame.getContentPane().add(new JScrollPane(app.getGraphCanvas()), BorderLayout.CENTER);
 		frame.setSize(720,480);
 		frame.setVisible(true);
 	}
