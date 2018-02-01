@@ -6,6 +6,7 @@ import de.ralfhergert.telemetry.graph.LineGraphListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -87,28 +88,13 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 		g.setBackground(Color.BLACK);
 		g.clearRect(0, 0, getWidth(), getHeight());
 
-		double minKey = Double.MAX_VALUE;
-		double maxKey = Double.MIN_VALUE;
-		double minValue = 0;
-		double maxValue = 0;
-		for (LineGraph graph : graphs) {
-			Path2D path = graph.getPath();
-			if (path == null) {
-				continue;
-			}
-			minKey = Math.min(minKey, path.getBounds().getMinX());
-			maxKey = Math.max(maxKey, path.getBounds().getMaxX());
-			minValue = Math.min(minValue, path.getBounds().getMinY());
-			maxValue = Math.max(maxValue, path.getBounds().getMaxY());
-		}
-		final double wantedXSize = maxKey - minKey;
-		final double wantedYSize = maxValue - minValue;
-		if (wantedXSize == 0 || wantedYSize == 0) {
+		final Rectangle2D pathBounds = calcCombinedPathBounds();
+		if (pathBounds.getWidth() == 0 || pathBounds.getHeight() == 0) {
 			return; // nothing to draw
 		}
 		g.translate(0, getHeight());
-		g.scale(getWidth() / wantedXSize, -getHeight() / wantedYSize);
-		g.translate(0, -minValue);
+		g.scale(getWidth() / pathBounds.getWidth(), -getHeight() / pathBounds.getHeight());
+		g.translate(0, -pathBounds.getMinY());
 		{ // render line at y = 0
 			g.setColor(zeroLineColor);
 			g.drawLine(0, 0, getWidth(), 0);
@@ -124,24 +110,32 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 		}
 	}
 
-	@Override
-	public Dimension getPreferredSize() {
-		double minKey = Double.MAX_VALUE;
-		double maxKey = Double.MIN_VALUE;
-		double minValue = 0;
-		double maxValue = 0;
+	public Rectangle2D calcCombinedPathBounds() {
+		Rectangle2D bounds = null;
 		for (LineGraph graph : graphs) {
 			Path2D path = graph.getPath();
 			if (path == null) {
 				continue;
 			}
-			minKey = Math.min(minKey, path.getBounds().getMinX());
-			maxKey = Math.max(maxKey, path.getBounds().getMaxX());
-			minValue = Math.min(minValue, path.getBounds().getMinY());
-			maxValue = Math.max(maxValue, path.getBounds().getMaxY());
+			if (bounds == null) {
+				bounds = path.getBounds2D();
+			} else {
+				bounds = bounds.createUnion(path.getBounds2D());
+			}
 		}
-		final double wantedXSize = (maxKey - minKey) * xScale;
-		final double wantedYSize = (maxValue - minValue) * yScale;
+		if (bounds == null) {
+			return new Rectangle2D.Float(0, 0, 0, 0);
+		} else {
+			// ensure y=0 is contained within the bounds.
+			return bounds.createUnion(new Rectangle2D.Double(bounds.getX(), 0, bounds.getWidth(), 0));
+		}
+	}
+
+	@Override
+	public Dimension getPreferredSize() {
+		Rectangle2D bounds = calcCombinedPathBounds();
+		final double wantedXSize = bounds.getWidth() * xScale;
+		final double wantedYSize = bounds.getHeight() * yScale;
 		return new Dimension((int)wantedXSize, (int)wantedYSize);
 	}
 
