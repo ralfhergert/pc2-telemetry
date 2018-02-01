@@ -45,16 +45,7 @@ public class Telemetry {
 
 	public static void main(String... args) throws IOException {
 		final Telemetry app = new Telemetry();
-
-		final JFrame frame = new JFrame("Racing Telemetry");
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new BorderLayout());
-
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				app.shutdown();
-			}
-		});
+		final TelemetryFrame frame = new TelemetryFrame(app);
 
 		final IndexedRepository<CarPhysicsPackage> carPhysicRepository = new IndexedRepository<>((Comparator<CarPhysicsPackage>)
 			(o1, o2) -> o1.getReceivedDate().compareTo(o2.getReceivedDate())
