@@ -12,7 +12,10 @@ public class StringParser {
 	public static String parse(byte[] data, int offset, int length) {
 		String value = "";
 		for (int i = 0; i < length && i + offset < data.length; i++) {
-			value += data[i + offset];
+			if (data[i + offset] == 0) {
+				break; // null-terminated-string.
+			}
+			value += (char)data[i + offset];
 		}
 		return value;
 	}
