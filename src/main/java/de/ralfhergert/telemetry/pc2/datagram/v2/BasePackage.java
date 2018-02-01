@@ -20,6 +20,8 @@ public class BasePackage {
 	private PackageTypes packetType;   //10 what is the type of this packet (ordinal of the PackageTypes)
 	private short packetVersion;       //11 what is the version of protocol for this handler, to be bumped with data structure change
 
+	public BasePackage() {}
+
 	public BasePackage(byte[] data) {
 		this(data, new Date());
 	}

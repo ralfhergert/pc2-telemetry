@@ -81,6 +81,8 @@ public class CarPhysicsPackage extends BasePackage {
 	public Vector fullPosition;           // 542 12 -- position of the viewed participant with full precision
 	public short brakeBias;               // 554 1  -- quantized brake bias
 
+	public CarPhysicsPackage() {}
+
 	public CarPhysicsPackage(byte[] data) {
 		super(data);
 		if (data.length < 556) {
