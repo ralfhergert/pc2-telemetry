@@ -1,10 +1,10 @@
 package de.ralfhergert.telemetry.pc2.datagram.v2;
 
 /**
- * Existing package types.
+ * Existing packet types.
  * Do not change order. Ordinal is important.
  */
-public enum PackageTypes {
+public enum PacketTypes {
 	CarPhysics,
 	RaceDefinition,
 	Participants,

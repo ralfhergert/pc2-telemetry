@@ -5,11 +5,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 /**
- * Receives UDP packages from Project Cars 2.
+ * Receives UDP packet from Project Cars 2.
  */
 public class UDPReceiver implements Runnable {
 
-	private int maxPackageSize = 2048;
+	private int maxPacketSize = 2048;
 	private DatagramSocket socket;
 	private UDPListener listener;
 
@@ -21,7 +21,7 @@ public class UDPReceiver implements Runnable {
 	@Override
 	public void run() {
 		for(;;) {
-			byte buf[] = new byte[maxPackageSize];
+			byte buf[] = new byte[maxPacketSize];
 			DatagramPacket packet = new DatagramPacket(buf, buf.length);
 			try {
 				socket.receive(packet);

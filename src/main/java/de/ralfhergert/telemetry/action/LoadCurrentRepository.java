@@ -1,7 +1,7 @@
 package de.ralfhergert.telemetry.action;
 
 import de.ralfhergert.telemetry.Telemetry;
-import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPackage;
+import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPacket;
 import de.ralfhergert.telemetry.repository.Repository;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class LoadCurrentRepository extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		Repository<CarPhysicsPackage> repository = application.getCurrentRepository();
+		Repository<CarPhysicsPacket> repository = application.getCurrentRepository();
 		if (repository == null) {
 			return;
 		}

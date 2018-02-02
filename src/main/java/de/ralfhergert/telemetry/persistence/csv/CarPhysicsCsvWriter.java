@@ -1,16 +1,16 @@
 package de.ralfhergert.telemetry.persistence.csv;
 
-import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPackage;
+import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPacket;
 
 import java.io.*;
 import java.util.stream.Stream;
 
 /**
- * Writes a stream of {@link CarPhysicsPackage} as CSV onto given {@link OutputStream}.
+ * Writes a stream of {@link CarPhysicsPacket} as CSV onto given {@link OutputStream}.
  */
 public class CarPhysicsCsvWriter {
 
-	public void write(Stream<CarPhysicsPackage> packets, OutputStream outStream) throws IOException {
+	public void write(Stream<CarPhysicsPacket> packets, OutputStream outStream) throws IOException {
 		if (packets == null) {
 			throw new IllegalArgumentException("packets can not be null");
 		}

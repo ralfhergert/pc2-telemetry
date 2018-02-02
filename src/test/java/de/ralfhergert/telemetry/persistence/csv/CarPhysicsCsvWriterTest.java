@@ -1,6 +1,6 @@
 package de.ralfhergert.telemetry.persistence.csv;
 
-import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPackage;
+import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPacket;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,15 +22,15 @@ public class CarPhysicsCsvWriterTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNullOutputStreamIsRejected() throws IOException {
-		new CarPhysicsCsvWriter().write(new ArrayList<CarPhysicsPackage>().stream(), null);
+		new CarPhysicsCsvWriter().write(new ArrayList<CarPhysicsPacket>().stream(), null);
 		Assert.fail("CarPhysicCsvWriter should have not been accepting null as output stream");
 	}
 
 	@Test
-	public void testExportOfDefaultCarPhysicsPackage() throws IOException {
+	public void testExportOfDefaultCarPhysicsPacket() throws IOException {
 		byte[] emptyCarPacketBytes = new byte[556];
 		emptyCarPacketBytes[11] = 2;
-		final CarPhysicsPackage packet = new CarPhysicsPackage(emptyCarPacketBytes);
+		final CarPhysicsPacket packet = new CarPhysicsPacket(emptyCarPacketBytes);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		new CarPhysicsCsvWriter().write(Stream.of(packet), stream);
 		Assert.assertFalse("something was written", stream.toString("UTF-8").isEmpty());

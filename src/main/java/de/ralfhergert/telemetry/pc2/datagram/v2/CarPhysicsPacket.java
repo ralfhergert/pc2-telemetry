@@ -3,11 +3,11 @@ package de.ralfhergert.telemetry.pc2.datagram.v2;
 import de.ralfhergert.telemetry.pc2.datagram.*;
 
 /**
- * Holds the data of a single CarPhysics package.
+ * Holds the data of a single CarPhysics packet.
  * @see <a href="https://www.projectcarsgame.com/project-cars-2-api.html"></a>
  * @see <a href="https://www.projectcarsgame.com/uploads/2/0/6/5/20658008/sms_udp_definitions.hpp">UDP Patch 3</a>
  */
-public class CarPhysicsPackage extends BasePackage {
+public class CarPhysicsPacket extends BasePacket {
 
 	public short viewedParticipantIndex;  // 12 1
 	// Unfiltered input
@@ -81,15 +81,15 @@ public class CarPhysicsPackage extends BasePackage {
 	public Vector fullPosition           = new Vector(0, 0, 0);     // 542 12 -- position of the viewed participant with full precision
 	public short brakeBias;               // 554 1  -- quantized brake bias
 
-	public CarPhysicsPackage() {}
+	public CarPhysicsPacket() {}
 
-	public CarPhysicsPackage(byte[] data) {
+	public CarPhysicsPacket(byte[] data) {
 		super(data);
 		if (data.length < 556) {
-			throw new IllegalArgumentException("given data array is too short to be read as CarPhysicsPackage");
+			throw new IllegalArgumentException("given data array is too short to be read as CarPhysicsPacket");
 		}
-		if (getPacketType() != PackageTypes.CarPhysics || getPacketVersion() != 2) {
-			throw new IllegalArgumentException("data does resemble a CarPhysics package in version 2");
+		if (getPacketType() != PacketTypes.CarPhysics || getPacketVersion() != 2) {
+			throw new IllegalArgumentException("data does resemble a CarPhysics packet in version 2");
 		}
 		viewedParticipantIndex = data[12];
 		unfilteredThrottle = (short)Byte.toUnsignedInt(data[13]);

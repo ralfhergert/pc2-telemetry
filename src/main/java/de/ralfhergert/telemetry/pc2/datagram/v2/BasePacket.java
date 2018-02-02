@@ -5,11 +5,11 @@ import de.ralfhergert.telemetry.pc2.datagram.IntegerParser;
 import java.util.Date;
 
 /**
- * Each package shares the same base package information identifying the package.
+ * Each packet shares the same base packet information identifying the packet.
  * @see <a href="https://www.projectcarsgame.com/project-cars-2-api.html"></a>
  * @see <a href="https://www.projectcarsgame.com/uploads/2/0/6/5/20658008/sms_udp_definitions.hpp">UDP Patch 3</a>
  */
-public class BasePackage {
+public class BasePacket {
 
 	private Date receivedDate;
 
@@ -17,27 +17,27 @@ public class BasePackage {
 	private int categoryPacketNumber;  //4 counter of the packet groups belonging to the given category
 	private short partialPacketIndex;  //8 If the data from this class had to be sent in several packets, the index number
 	private short partialPacketNumber; //9 If the data from this class had to be sent in several packets, the total number
-	private PackageTypes packetType;   //10 what is the type of this packet (ordinal of the PackageTypes)
+	private PacketTypes packetType;   //10 what is the type of this packet (ordinal of the PacketTypes)
 	private short packetVersion;       //11 what is the version of protocol for this handler, to be bumped with data structure change
 
-	public BasePackage() {}
+	public BasePacket() {}
 
-	public BasePackage(byte[] data) {
+	public BasePacket(byte[] data) {
 		this(data, new Date());
 	}
 
-	public BasePackage(byte[] data, Date receivedDate) {
+	public BasePacket(byte[] data, Date receivedDate) {
 		if (data == null) {
 			throw new IllegalArgumentException("data must not be null");
 		}
 		if (data.length < 12) {
-			throw new IllegalArgumentException("given data array is too short to be read as BasePackage");
+			throw new IllegalArgumentException("given data array is too short to be read as BasePacket");
 		}
 		packetNumber = IntegerParser.parse(data, 0);
 		categoryPacketNumber = IntegerParser.parse(data, 4);
 		partialPacketIndex = data[8];
 		partialPacketNumber = data[9];
-		packetType = PackageTypes.values()[data[10]];
+		packetType = PacketTypes.values()[data[10]];
 		packetVersion = data[11];
 		this.receivedDate = receivedDate;
 	}
@@ -74,11 +74,11 @@ public class BasePackage {
 		this.partialPacketNumber = partialPacketNumber;
 	}
 
-	public PackageTypes getPacketType() {
+	public PacketTypes getPacketType() {
 		return packetType;
 	}
 
-	public void setPacketType(PackageTypes packetType) {
+	public void setPacketType(PacketTypes packetType) {
 		this.packetType = packetType;
 	}
 
@@ -100,7 +100,7 @@ public class BasePackage {
 
 	@Override
 	public String toString() {
-		return "BasePackage{" +
+		return "BasePacket{" +
 			"packetNumber=" + packetNumber +
 			", categoryPacketNumber=" + categoryPacketNumber +
 			", partialPacketIndex=" + partialPacketIndex +
