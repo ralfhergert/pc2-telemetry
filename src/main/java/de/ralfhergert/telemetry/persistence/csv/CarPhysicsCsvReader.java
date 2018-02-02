@@ -110,12 +110,22 @@ public class CarPhysicsCsvReader {
 			carPhysicsPacket.joyPad0 = Integer.valueOf(part[155]);
 			carPhysicsPacket.dPad = Short.valueOf(part[156]);
 
-			carPhysicsPacket.tyreCompound = new String[]{part[157], part[158], part[159], part[160]};
+			carPhysicsPacket.tyreCompound = new String[]{extractString(part[157]), extractString(part[158]), extractString(part[159]), extractString(part[160])};
 			carPhysicsPacket.turboBoostPressure = Float.valueOf(part[161]);
 
 			carPhysicsPacket.fullPosition = new Vector(Float.valueOf(part[162]), Float.valueOf(part[163]), Float.valueOf(part[164]));
 			carPhysicsPacket.brakeBias = Short.valueOf(part[165]);
 			repository.addItem(carPhysicsPacket);
 		});
+	}
+
+	public static String extractString(String csvString) {
+		if (csvString.startsWith("\"")) {
+			csvString = csvString.substring(1);
+		}
+		if (csvString.endsWith("\"")) {
+			csvString = csvString.substring(0, csvString.length() - 1);
+		}
+		return csvString.replaceAll("\"\"", "\"");
 	}
 }
