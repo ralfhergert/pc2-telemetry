@@ -30,7 +30,7 @@ public class CarPhysicsCsvReader {
 		reader.lines().forEach((line) -> {
 			String[] part = line.split(",");
 			CarPhysicsPackage carPhysicsPackage = new CarPhysicsPackage();
-			carPhysicsPackage.setReceivedDate(new Date(Integer.valueOf(part[0])));
+			carPhysicsPackage.setReceivedDate(new Date(Long.valueOf(part[0])));
 			carPhysicsPackage.setPacketNumber(Integer.valueOf(part[1]));
 			carPhysicsPackage.setCategoryPacketNumber(Integer.valueOf(part[2]));
 			carPhysicsPackage.setPartialPacketIndex(Short.valueOf(part[3]));
