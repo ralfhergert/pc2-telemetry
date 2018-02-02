@@ -35,40 +35,40 @@ public class CarPhysicsPackage extends BasePackage {
 	public short boostAmount;             // 46 1
 	public short crashState;              // 47 1
 	public float odometerKM;              // 48 4
-	public Vector orientation;            // 52 12
-	public Vector localVelocity;          // 64 12
-	public Vector worldVelocity;          // 76 12
-	public Vector angularVelocity;        // 88 12
-	public Vector localAcceleration;      // 100 12
-	public Vector worldAcceleration;      // 112 12
-	public Vector extentsCentre;          // 124 12
-	public byte tyreFlags[];              // 136 4
-	public byte terrain[];                // 140 4
-	public float tyreY[];                 // 144 16
-	public float tyreRPS[];               // 160 16
-	public short tyreTemp[];              // 176 4
-	public float tyreHeightAboveGround[]; // 180 16
-	public short tyreWear[];              // 196 4
-	public short brakeDamage[];           // 200 4
-	public short suspensionDamage[];      // 204 4
-	public short brakeTempCelsius[];      // 208 8
-	public short tyreTreadTemp[];         // 216 8
-	public short tyreLayerTemp[];         // 224 8
-	public short tyreCarcassTemp[];       // 232 8
-	public short tyreRimTemp[];           // 240 8
-	public short tyreInternalAirTemp[];   // 248 8
-	public short tyreTempLeft[];          // 256 8
-	public short tyreTempCenter[];        // 264 8
-	public short tyreTempRight[];         // 272 8
-	public float wheelLocalPositionY[];   // 280 16
-	public float rideHeight[];            // 296 16
-	public float suspensionTravel[];      // 312 16
-	public float suspensionVelocity[];    // 328 16
-	public float suspensionRideHeight[];  // 344 8
-	public float airPressure[];           // 352 8
+	public Vector orientation            = new Vector(0, 0, 0);     // 52 12
+	public Vector localVelocity          = new Vector(0, 0, 0);     // 64 12
+	public Vector worldVelocity          = new Vector(0, 0, 0);     // 76 12
+	public Vector angularVelocity        = new Vector(0, 0, 0);     // 88 12
+	public Vector localAcceleration      = new Vector(0, 0, 0);     // 100 12
+	public Vector worldAcceleration      = new Vector(0, 0, 0);     // 112 12
+	public Vector extentsCentre          = new Vector(0, 0, 0);     // 124 12
+	public byte tyreFlags[]              = new byte[]{0, 0, 0, 0};  // 136 4
+	public byte terrain[]                = new byte[]{0, 0, 0, 0};  // 140 4
+	public float tyreY[]                 = new float[]{0, 0, 0, 0}; // 144 16
+	public float tyreRPS[]               = new float[]{0, 0, 0, 0}; // 160 16
+	public short tyreTemp[]              = new short[]{0, 0, 0, 0}; // 176 4
+	public float tyreHeightAboveGround[] = new float[]{0, 0, 0, 0}; // 180 16
+	public short tyreWear[]              = new short[]{0, 0, 0, 0}; // 196 4
+	public short brakeDamage[]           = new short[]{0, 0, 0, 0}; // 200 4
+	public short suspensionDamage[]      = new short[]{0, 0, 0, 0}; // 204 4
+	public short brakeTempCelsius[]      = new short[]{0, 0, 0, 0}; // 208 8
+	public short tyreTreadTemp[]         = new short[]{0, 0, 0, 0}; // 216 8
+	public short tyreLayerTemp[]         = new short[]{0, 0, 0, 0}; // 224 8
+	public short tyreCarcassTemp[]       = new short[]{0, 0, 0, 0}; // 232 8
+	public short tyreRimTemp[]           = new short[]{0, 0, 0, 0}; // 240 8
+	public short tyreInternalAirTemp[]   = new short[]{0, 0, 0, 0}; // 248 8
+	public short tyreTempLeft[]          = new short[]{0, 0, 0, 0}; // 256 8
+	public short tyreTempCenter[]        = new short[]{0, 0, 0, 0}; // 264 8
+	public short tyreTempRight[]         = new short[]{0, 0, 0, 0}; // 272 8
+	public float wheelLocalPositionY[]   = new float[]{0, 0, 0, 0}; // 280 16
+	public float rideHeight[]            = new float[]{0, 0, 0, 0}; // 296 16
+	public float suspensionTravel[]      = new float[]{0, 0, 0, 0}; // 312 16
+	public float suspensionVelocity[]    = new float[]{0, 0, 0, 0}; // 328 16
+	public float suspensionRideHeight[]  = new float[]{0, 0, 0, 0}; // 344 8
+	public float airPressure[]           = new float[]{0, 0, 0, 0}; // 352 8
 	public float engineSpeed;             // 360 4
 	public float engineTorque;            // 364 4
-	public short wings[];                 // 368 2
+	public short wings[]                 = new short[]{0, 0};       // 368 2
 	public short handBrake;               // 370 1
 	// Car damage
 	public short aeroDamage;              // 371 1
@@ -76,9 +76,9 @@ public class CarPhysicsPackage extends BasePackage {
 	//  HW state
 	public int joyPad0;                   // 376 4
 	public short dPad;                    // 377 1
-	public String tyreCompound[];         // 378 160
+	public String tyreCompound[]         = new String[]{"", "", "", ""}; // 378 160
 	public float turboBoostPressure;      // 538 4
-	public Vector fullPosition;           // 542 12 -- position of the viewed participant with full precision
+	public Vector fullPosition           = new Vector(0, 0, 0);     // 542 12 -- position of the viewed participant with full precision
 	public short brakeBias;               // 554 1  -- quantized brake bias
 
 	public CarPhysicsPackage() {}
