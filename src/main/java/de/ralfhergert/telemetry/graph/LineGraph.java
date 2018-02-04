@@ -1,6 +1,7 @@
 package de.ralfhergert.telemetry.graph;
 
 import de.ralfhergert.telemetry.property.PropertyValues;
+import de.ralfhergert.telemetry.reflection.Accessor;
 import de.ralfhergert.telemetry.repository.IndexedRepository;
 import de.ralfhergert.telemetry.repository.Repository;
 import de.ralfhergert.telemetry.repository.RepositoryListener;
