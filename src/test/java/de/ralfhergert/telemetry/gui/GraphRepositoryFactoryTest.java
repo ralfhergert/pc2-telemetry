@@ -20,7 +20,7 @@ public class GraphRepositoryFactoryTest {
 			long number = carPhysicsPacket.getPacketNumber();
 			return (offset == null) ? number : number - offset;
 		};
-		Repository<LineGraph> lineGraphRepository = new GraphRepositoryFactory().createLineGraphs(packetRepository, packetNumberAccessor, null);
+		Repository<LineGraph> lineGraphRepository = new GraphRepositoryFactory().createLineGraphs(packetRepository, packetNumberAccessor, new CarPhysicsPacket());
 		Assert.assertNotNull("lineGraphRepository should not be null", lineGraphRepository);
 		Assert.assertTrue("lineGraphRepository should not be empty", lineGraphRepository.getItemStream().count() > 0);
 		Assert.assertTrue("every line graph has a name", lineGraphRepository.getItemStream().allMatch((graph) -> graph.getProperty("name", null) != null));

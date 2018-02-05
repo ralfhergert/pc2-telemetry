@@ -9,6 +9,7 @@ import de.ralfhergert.telemetry.repository.ItemRepository;
 import de.ralfhergert.telemetry.repository.Repository;
 
 import java.awt.Color;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -44,11 +45,9 @@ public class GraphRepositoryFactory {
 				if (!isNumber(propertyInfo.getPropertyType().getComponentType())) {
 					continue; // skip this field if its not a number.
 				}
-				int length = 1;
-				// use the sample to detect the array length.
-				if (sampleItem != null) {
-					// TODO implement array length detection.
-				}
+				// try to use the sampleItem to detect the array length.
+				final int length = (sampleItem == null) ? 1 : detectArraySize(sampleItem, propertyInfo.getPropertyAccessor());
+
 				for (int i = 0; i < length; i++) {
 					graphRepository.addItem(
 						new LineGraph<>(carPhysicRepository, keyAccessor, getArrayAccessor(propertyInfo.getPropertyType(), propertyInfo.getPropertyAccessor(), i))
@@ -101,4 +100,11 @@ public class GraphRepositoryFactory {
 			|| double.class.equals(clazz);
 	}
 
+	public int detectArraySize(CarPhysicsPacket sample, Accessor<CarPhysicsPacket, ?> accessor) {
+		Object object = accessor.getValue(sample);
+		if (object != null && object.getClass().isArray()) {
+			return Array.getLength(object);
+		}
+		return 0;
+	}
 }
