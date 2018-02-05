@@ -8,6 +8,8 @@ import de.ralfhergert.telemetry.repository.Repository;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.awt.Color;
+
 /**
  * Ensures that {@link GraphRepositoryFactory} is working correctly.
  */
@@ -25,5 +27,20 @@ public class GraphRepositoryFactoryTest {
 		Assert.assertTrue("lineGraphRepository should not be empty", lineGraphRepository.getItemStream().count() > 0);
 		Assert.assertTrue("every line graph has a name", lineGraphRepository.getItemStream().allMatch((graph) -> graph.getProperty("name", null) != null));
 		Assert.assertTrue("every line graph has a color", lineGraphRepository.getItemStream().allMatch((graph) -> graph.getProperty("color", null) != null));
+	}
+
+	@Test
+	public void testDecodeColorRed() {
+		Assert.assertEquals("Color should have been decoded to red", Color.RED, GraphRepositoryFactory.decode("#ff0000ff"));
+	}
+
+	@Test
+	public void testDecodeColorGreen() {
+		Assert.assertEquals("Color should have been decoded to red", Color.GREEN, GraphRepositoryFactory.decode("#00ff00ff"));
+	}
+
+	@Test
+	public void testDecodeColorBlue() {
+		Assert.assertEquals("Color should have been decoded to red", Color.BLUE, GraphRepositoryFactory.decode("#0000ffff"));
 	}
 }

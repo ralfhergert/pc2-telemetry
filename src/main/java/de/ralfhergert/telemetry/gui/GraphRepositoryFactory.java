@@ -14,11 +14,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * This class will generate a {@link Repository} of {@link LineGraph}.
  */
 public class GraphRepositoryFactory {
+
+	private static final ResourceBundle graphColors = ResourceBundle.getBundle("graphColors");
 
 	/**
 	 * This method create a set of LineGraphs for the given {@param carPhysicsRepository}.
@@ -49,20 +52,22 @@ public class GraphRepositoryFactory {
 				final int length = (sampleItem == null) ? 1 : detectArraySize(sampleItem, propertyInfo.getPropertyAccessor());
 
 				for (int i = 0; i < length; i++) {
+					final String graphName = "carPhysicsPacket.property." + propertyInfo.getPropertyName() + "[" + i + "]";
 					graphRepository.addItem(
 						new LineGraph<>(carPhysicRepository, keyAccessor, getArrayAccessor(propertyInfo.getPropertyType(), propertyInfo.getPropertyAccessor(), i))
-							.setProperty("name", "carPhysicsPacket.property." + propertyInfo.getPropertyName() + "[" + i + "]")
-							.setProperty("color", Color.GREEN)
+							.setProperty("name", graphName)
+							.setProperty("color", graphColors.containsKey(graphName) ? decode(graphColors.getString(graphName)) : Color.LIGHT_GRAY)
 					);
 				}
 			} else {
 				if (!isNumber(propertyInfo.getPropertyType())) {
 					continue; // skip this method.
 				}
+				final String graphName = "carPhysicsPacket.property." + propertyInfo.getPropertyName();
 				graphRepository.addItem(
 					new LineGraph<>(carPhysicRepository, keyAccessor, propertyInfo.getPropertyAccessor())
-						.setProperty("name", "carPhysicsPacket.property." + propertyInfo.getPropertyName())
-						.setProperty("color", Color.GREEN)
+						.setProperty("name", graphName)
+						.setProperty("color", graphColors.containsKey(graphName) ? decode(graphColors.getString(graphName)) : Color.LIGHT_GRAY)
 				);
 			}
 		}
@@ -106,5 +111,13 @@ public class GraphRepositoryFactory {
 			return Array.getLength(object);
 		}
 		return 0;
+	}
+
+	/**
+	 * This method will decode a string like "#ff0000ff" into a RGBA-Color.
+	 */
+	public static Color decode(String value) throws NumberFormatException {
+		final long i = Long.decode(value);
+		return new Color((int)((i >> 24) & 0xFF), (int)((i >> 16) & 0xFF), (int)((i >> 8) & 0xFF), (int)(i & 0xFF));
 	}
 }
