@@ -13,9 +13,6 @@ public class FieldAccessor<Item, Value> implements Accessor<Item, Value> {
 		if (field == null) {
 			throw new IllegalArgumentException("field can not be null");
 		}
-		if (!field.isAccessible()) {
-			throw new IllegalArgumentException("field must be accessible");
-		}
 		this.field = field;
 	}
 

@@ -13,9 +13,6 @@ public class MethodAccessor<Item, Value> implements Accessor<Item, Value> {
 		if (method == null) {
 			throw new IllegalArgumentException("method can not be null");
 		}
-		if (!method.isAccessible()) {
-			throw new IllegalArgumentException("method must be accessible");
-		}
 		this.method = method;
 	}
 
