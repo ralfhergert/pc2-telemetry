@@ -8,10 +8,11 @@ import de.ralfhergert.telemetry.repository.IndexedRepository;
 import de.ralfhergert.telemetry.repository.ItemRepository;
 import de.ralfhergert.telemetry.repository.Repository;
 
-import java.awt.*;
+import java.awt.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class will generate a {@link Repository} of {@link LineGraph}.
@@ -24,16 +25,23 @@ public class GraphRepositoryFactory {
 	 * @param keyAccessor determines which value is key for all generated LineGraphs.
 	 * @param sampleItem mainly is used to detect the length of array values.
 	 */
-	public Repository<LineGraph> createLineGraphs(IndexedRepository<CarPhysicsPacket> carPhysicRepository, NegativeOffsetAccessor<CarPhysicsPacket, Number> keyAccessor, CarPhysicsPacket sampleItem) {
+	public Repository<LineGraph> createLineGraphs(IndexedRepository<CarPhysicsPacket> carPhysicRepository, NegativeOffsetAccessor<CarPhysicsPacket, ? extends Number> keyAccessor, CarPhysicsPacket sampleItem) {
 		final Repository<LineGraph> graphRepository = new ItemRepository<>();
 
+		final List<PropertyInfo<CarPhysicsPacket>> propertyInfoList = new ArrayList<>();
 		// use reflection to iterate over all fields and compare them.
 		for (Field field : CarPhysicsPacket.class.getFields()) {
-			if (!field.isAccessible() || !field.getType().isAssignableFrom(Number.class)) {
-				continue; // skip this field if its neither accessible nor a number.
+			propertyInfoList.add(new PropertyInfo<>(field.getName(), field.getType(), new FieldAccessor<>(field)));
+		}
+		for (Method method : CarPhysicsPacket.class.getMethods()) {
+			if (method.getName().startsWith("get")) {
+				final String propertyName = convertFirstCharacterToLowerCase(method.getName().substring(3));
+				propertyInfoList.add(new PropertyInfo<>(propertyName, method.getReturnType(), new MethodAccessor<>(method)));
 			}
-			if (field.getType().isArray()) {
-				if (!field.getType().getComponentType().isAssignableFrom(Number.class)) {
+		}
+		for (PropertyInfo<CarPhysicsPacket> propertyInfo : propertyInfoList) {
+			if (propertyInfo.getPropertyType().isArray()) {
+				if (!isNumber(propertyInfo.getPropertyType().getComponentType())) {
 					continue; // skip this field if its not a number.
 				}
 				int length = 1;
@@ -43,56 +51,93 @@ public class GraphRepositoryFactory {
 				}
 				for (int i = 0; i < length; i++) {
 					graphRepository.addItem(
-						new LineGraph<>(carPhysicRepository, keyAccessor, getArrayAccessor(field.getType().getComponentType(), new FieldAccessor<>(field), i)).setProperty("color", Color.GREEN)
+						new LineGraph<>(carPhysicRepository, keyAccessor, getArrayAccessor(propertyInfo.getPropertyType(), propertyInfo.getPropertyAccessor(), i))
+							.setProperty("name", "carPhysicsPacket.property." + propertyInfo.getPropertyName() + "[" + i + "]")
+							.setProperty("color", Color.GREEN)
 					);
 				}
 			} else {
-				if (!field.getType().isAssignableFrom(Number.class)) {
-					continue; // skip this field if its not a number.
+				if (!isNumber(propertyInfo.getPropertyType())) {
+					continue; // skip this method.
 				}
 				graphRepository.addItem(
-					new LineGraph<>(carPhysicRepository, keyAccessor, new FieldAccessor<>(field)).setProperty("color", Color.GREEN)
+					new LineGraph<>(carPhysicRepository, keyAccessor, propertyInfo.getPropertyAccessor())
+						.setProperty("name", "carPhysicsPacket.property." + propertyInfo.getPropertyName())
+						.setProperty("color", Color.GREEN)
 				);
-			}
-		}
-		for (Method method : CarPhysicsPacket.class.getMethods()) {
-			if (method.getName().startsWith("get")) {
-				if (method.getReturnType().isArray()) {
-					if (!method.getReturnType().getComponentType().isAssignableFrom(Number.class)) {
-						continue; // skip this field if its not a number.
-					}
-					int length = 1;
-					// use the sample to detect the array length.
-					if (sampleItem != null) {
-						// TODO implement array length detection.
-					}
-					for (int i = 0; i < length; i++) {
-						graphRepository.addItem(
-							new LineGraph<>(carPhysicRepository, keyAccessor, getArrayAccessor(method.getReturnType().getComponentType(), new MethodAccessor<>(method), i)).setProperty("color", Color.GREEN)
-						);
-					}
-				} else {
-					if (!method.getReturnType().isAssignableFrom(Number.class)) {
-						continue; // skip this method.
-					}
-					graphRepository.addItem(
-						new LineGraph<>(carPhysicRepository, keyAccessor, new MethodAccessor<>(method)).setProperty("color", Color.GREEN)
-					);
-				}
 			}
 		}
 		return graphRepository;
 	}
 
-	private <Item> Accessor<Item, ? extends Number> getArrayAccessor(Type type, Accessor<Item, ?> accessor, int index) {
-		if (type.getClass().isAssignableFrom(byte[].class)) {
+	private <Item> Accessor<Item, ? extends Number> getArrayAccessor(Class type, Accessor<Item, ?> accessor, int index) {
+		if (!type.isArray()) {
+			throw new IllegalArgumentException("given type is not an array: " + type);
+		}
+		if (byte[].class.equals(type)) {
 			return new ByteArrayAccessor<>(index, (Accessor<Item, byte[]>)accessor);
-		} else if (type.getClass().isAssignableFrom(short[].class)) {
+		} else if (short[].class.equals(type)) {
 			return new ShortArrayAccessor<>(index, (Accessor<Item, short[]>)accessor);
-		} else if (type.getClass().isAssignableFrom(float[].class)) {
+		} else if (float[].class.equals(type)) {
 			return new FloatArrayAccessor<>(index, (Accessor<Item, float[]>)accessor);
 		} else {
 			throw new IllegalArgumentException("no array accessor available for " + type);
+		}
+	}
+
+	public static String convertFirstCharacterToLowerCase(String text) {
+		if (text == null || text.isEmpty()) {
+			return text;
+		}
+		return text.substring(0, 1).toLowerCase() + text.substring(1);
+	}
+
+	public static boolean isNumber(Class clazz) {
+		return Number.class.isAssignableFrom(clazz)
+			|| short.class.equals(clazz)
+			|| int.class.equals(clazz)
+			|| long.class.equals(clazz)
+			|| float.class.equals(clazz)
+			|| double.class.equals(clazz);
+	}
+
+	/**
+	 * This is a helper class to group:
+	 *  * a property name
+	 *  * a property's type
+	 *  * a appropriate accessor
+	 */
+	public static class PropertyInfo<Item> {
+
+		private final String propertyName;
+		private final Class propertyType;
+		private final Accessor<Item, Number> propertyAccessor;
+
+		public PropertyInfo(String propertyName, Class propertyType, Accessor<Item, Number> propertyAccessor) {
+			this.propertyName = propertyName;
+			this.propertyType = propertyType;
+			this.propertyAccessor = propertyAccessor;
+		}
+
+		public String getPropertyName() {
+			return propertyName;
+		}
+
+		public Class getPropertyType() {
+			return propertyType;
+		}
+
+		public Accessor<Item, Number> getPropertyAccessor() {
+			return propertyAccessor;
+		}
+
+		@Override
+		public String toString() {
+			return "PropertyInfo{" +
+				"propertyName='" + propertyName + '\'' +
+				", propertyType=" + propertyType +
+				", propertyAccessor=" + propertyAccessor +
+				'}';
 		}
 	}
 }
