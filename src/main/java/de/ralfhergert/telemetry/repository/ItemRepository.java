@@ -14,7 +14,7 @@ public class ItemRepository<Type> implements Repository<Type> {
 
 	public ItemRepository<Type> addListener(RepositoryListener<Type> listener) {
 		if (listener == null) {
-			throw new IllegalArgumentException("listener ca not be null");
+			throw new IllegalArgumentException("listener can not be null");
 		}
 		if (!listeners.contains(listener)) {
 			listeners.add(listener);
@@ -24,7 +24,7 @@ public class ItemRepository<Type> implements Repository<Type> {
 
 	public ItemRepository<Type> removeListener(RepositoryListener<Type> listener) {
 		if (listener == null) {
-			throw new IllegalArgumentException("listener ca not be null");
+			throw new IllegalArgumentException("listener can not be null");
 		}
 		listeners.remove(listener);
 		return this;
