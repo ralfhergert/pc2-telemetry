@@ -1,14 +1,16 @@
 package de.ralfhergert.telemetry;
 
 import de.ralfhergert.telemetry.graph.LineGraph;
+import de.ralfhergert.telemetry.gui.GraphRepositoryFactory;
+import de.ralfhergert.telemetry.gui.MultiGraphCanvas;
 import de.ralfhergert.telemetry.graph.NegativeOffsetAccessor;
-import de.ralfhergert.telemetry.gui.GraphCanvas;
 import de.ralfhergert.telemetry.pc2.UDPListener;
 import de.ralfhergert.telemetry.pc2.UDPReceiver;
 import de.ralfhergert.telemetry.pc2.datagram.v2.BasePacket;
 import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPacket;
 import de.ralfhergert.telemetry.pc2.datagram.v2.PacketParser;
 import de.ralfhergert.telemetry.repository.IndexedRepository;
+import de.ralfhergert.telemetry.repository.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,9 @@ public class Telemetry {
 	private final ApplicationProperties properties;
 
 	private IndexedRepository<CarPhysicsPacket> currentRepository;
-	private GraphCanvas<CarPhysicsPacket, Long, Short> graphCanvas;
+	private Repository<LineGraph> graphRepository;
+
+	private MultiGraphCanvas multiGraphCanvas;
 
 	public Telemetry() throws SocketException {
 		properties = new ApplicationProperties(new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".PC2Telemetry", "defaults.ini"));
@@ -46,16 +50,8 @@ public class Telemetry {
 			return (offset == null) ? timestamp : timestamp - offset;
 		};
 
-		final LineGraph<CarPhysicsPacket, Long, Short> graphUnfilteredThrottle = new LineGraph<>(currentRepository, timeStampAccessor, (p) -> p.unfilteredThrottle).setProperty("color", Color.GREEN);
-		final LineGraph<CarPhysicsPacket, Long, Short> graphThrottle = new LineGraph<>(currentRepository, timeStampAccessor, (p) -> p.throttle).setProperty("color", new Color(0f, 1f, 0f, 0.4f));
-		final LineGraph<CarPhysicsPacket, Long, Short> graphUnfilteredBreak = new LineGraph<>(currentRepository, timeStampAccessor, (p) -> p.unfilteredBrake).setProperty("color", Color.RED);
-		final LineGraph<CarPhysicsPacket, Long, Short> graphBrake = new LineGraph<>(currentRepository, timeStampAccessor, (p) -> p.brake).setProperty("color", new Color(1f, 0f, 0f, 0.4f));
-
-		graphCanvas = new GraphCanvas<CarPhysicsPacket,Long,Short>()
-			.addGraph(graphThrottle)
-			.addGraph(graphUnfilteredThrottle)
-			.addGraph(graphBrake)
-			.addGraph(graphUnfilteredBreak);
+		graphRepository = new GraphRepositoryFactory().createLineGraphs(currentRepository, timeStampAccessor, new CarPhysicsPacket());
+		multiGraphCanvas = new MultiGraphCanvas(graphRepository);
 
 		DatagramSocket socket = new DatagramSocket(5606);
 		new Thread(new UDPReceiver(socket, new UDPListener() {
@@ -76,8 +72,8 @@ public class Telemetry {
 		return currentRepository;
 	}
 
-	public GraphCanvas<CarPhysicsPacket, Long, Short> getGraphCanvas() {
-		return graphCanvas;
+	public MultiGraphCanvas getGraphCanvas() {
+		return multiGraphCanvas;
 	}
 
 	/**
