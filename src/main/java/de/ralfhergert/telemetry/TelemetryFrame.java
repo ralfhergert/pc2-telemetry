@@ -15,7 +15,7 @@ public class TelemetryFrame extends JFrame {
 
 	public TelemetryFrame(final Telemetry application) throws HeadlessException {
 		super(ResourceBundle.getBundle("messages").getString("application.title"));
-		setIconImage(new ImageIcon(getClass().getClassLoader().getResource("icon.png")).getImage());
+		setIconImage(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("icon.png")));
 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
