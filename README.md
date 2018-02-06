@@ -20,7 +20,7 @@ Version 1 is still in development. The wanted features for version 1 are:
 
 
 # How to request features or report bugs?
-Please have a look at the [issues of pc2-telemetry](https://github.com/ralfhergert/pc2-telemetry/issues) whether a simmilar
+Please have a look at the [issues of pc2-telemetry](https://github.com/ralfhergert/pc2-telemetry/issues) whether a similar
 feature request or bug report is already filed. If not then please create a new issue. If you would have already a solution
 consider creating a pull-request.
 
