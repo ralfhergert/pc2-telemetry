@@ -1,7 +1,9 @@
 package de.ralfhergert.telemetry.gui;
 
 import de.ralfhergert.telemetry.graph.LineGraph;
+import de.ralfhergert.telemetry.repository.LookupRepository;
 import de.ralfhergert.telemetry.repository.Repository;
+import de.ralfhergert.telemetry.repository.RepositoryConnector;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +18,7 @@ import java.util.ResourceBundle;
  */
 public class MultiGraphCanvas extends JPanel {
 
-	private final Repository<LineGraph> repository;
+	private final LookupRepository<String,LineGraph> lookupRepository;
 
 	private final MouseListener popupListener;
 	private final Action addLineGraphAction;
@@ -25,7 +27,8 @@ public class MultiGraphCanvas extends JPanel {
 		super(new GridBagLayout());
 		setBackground(Color.LIGHT_GRAY);
 
-		this.repository = repository;
+		lookupRepository = new LookupRepository<>((graph) -> String.valueOf(graph.getProperty("name", "")));
+		new RepositoryConnector<>(repository, lookupRepository);
 
 		addLineGraphAction = new AbstractAction(ResourceBundle.getBundle("messages").getString("multiGraphCanvas.action.addFurtherGraphCanvas")) {
 			@Override
