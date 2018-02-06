@@ -2,14 +2,17 @@ package de.ralfhergert.telemetry.action;
 
 import de.ralfhergert.telemetry.Telemetry;
 import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPacket;
+import de.ralfhergert.telemetry.persistence.csv.CarPhysicsCsvReader;
 import de.ralfhergert.telemetry.repository.Repository;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.io.*;
 import java.util.ResourceBundle;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 /**
  * This action will prompt a save dialog. When approved the application's current
@@ -46,14 +49,19 @@ public class LoadCurrentRepository extends AbstractAction {
 		});
 		fileChooser.setSelectedFile(new File("capture.pc2td"));
 		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-			/*try {
-				JarOutputStream jarStream = new JarOutputStream(new FileOutputStream(fileChooser.getSelectedFile()));
-				jarStream.putNextEntry(new ZipEntry("carPhysics"));
-				new CarPhysicsCsvWriter().write(repository.getItemStream(), jarStream);
-				jarStream.close();
+			try {
+				readAsJarFile(repository, new FileInputStream(fileChooser.getSelectedFile()));
 			} catch (IOException e) {
 				// TODO prompt a warning.
-			}*/
+			}
+		}
+	}
+
+	public static void readAsJarFile(Repository<CarPhysicsPacket> repository, InputStream inStream) throws IOException {
+		JarInputStream jarStream = new JarInputStream(inStream);
+		JarEntry entry = jarStream.getNextJarEntry();
+		if ("carPhysics".equals(entry.getName())) {
+			new CarPhysicsCsvReader().read(repository, jarStream);
 		}
 	}
 }

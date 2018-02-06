@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ResourceBundle;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -52,13 +53,17 @@ public class SaveCurrentRepository extends AbstractAction {
 		fileChooser.setSelectedFile(new File("capture.pc2td"));
 		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			try {
-				JarOutputStream jarStream = new JarOutputStream(new FileOutputStream(fileChooser.getSelectedFile()));
-				jarStream.putNextEntry(new ZipEntry("carPhysics"));
-				new CarPhysicsCsvWriter().write(repository.getItemStream(), jarStream);
-				jarStream.close();
+				writeAsJarFile(repository, new FileOutputStream(fileChooser.getSelectedFile()));
 			} catch (IOException e) {
 				// TODO prompt a warning.
 			}
 		}
+	}
+
+	public static void writeAsJarFile(Repository<CarPhysicsPacket> repository, OutputStream outStream) throws IOException {
+		JarOutputStream jarStream = new JarOutputStream(outStream);
+		jarStream.putNextEntry(new ZipEntry("carPhysics"));
+		new CarPhysicsCsvWriter().write(repository.getItemStream(), jarStream);
+		jarStream.close();
 	}
 }
