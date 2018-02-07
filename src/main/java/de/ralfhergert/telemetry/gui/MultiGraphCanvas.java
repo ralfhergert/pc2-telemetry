@@ -6,6 +6,7 @@ import de.ralfhergert.telemetry.repository.Repository;
 import de.ralfhergert.telemetry.repository.RepositoryConnector;
 
 import javax.swing.*;
+import java.util.List;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -24,6 +25,16 @@ public class MultiGraphCanvas extends JPanel {
 	private final Action addLineGraphAction;
 
 	public MultiGraphCanvas(Repository<LineGraph> repository) {
+		this(repository, null);
+	}
+
+	/**
+	 * Creates a new {@link MultiGraphCanvas}.
+	 * @param repository of {@link LineGraph} the user can choose from
+	 * @param initialConfig the initial configuration used directly after creation. It is supposed
+	 *        to be a list of lineGraph-names.
+	 */
+	public MultiGraphCanvas(Repository<LineGraph> repository, List<List<String>> initialConfig) {
 		super(new GridBagLayout());
 		setBackground(Color.LIGHT_GRAY);
 
@@ -52,6 +63,21 @@ public class MultiGraphCanvas extends JPanel {
 		};
 
 		addMouseListener(popupListener);
+
+		if (initialConfig != null) {
+			for (List<String> graphNames : initialConfig) {
+				final GraphCanvas graphCanvas = new GraphCanvas();
+				graphCanvas.addMouseListener(popupListener);
+				add(graphCanvas, createLayoutConstraints());
+				for (String graphName : graphNames) {
+					LineGraph lineGraph = lookupRepository.getItem(graphName);
+					if (lineGraph != null) {
+						graphCanvas.addGraph(lineGraph);
+					}
+				}
+			}
+			revalidate();
+		}
 	}
 
 	protected GridBagConstraints createLayoutConstraints() {

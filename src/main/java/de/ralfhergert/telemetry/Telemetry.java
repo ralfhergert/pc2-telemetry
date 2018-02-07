@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Comparator;
 
 /**
@@ -51,7 +52,20 @@ public class Telemetry {
 		};
 
 		graphRepository = new GraphRepositoryFactory().createLineGraphs(currentRepository, timeStampAccessor, new CarPhysicsPacket());
-		multiGraphCanvas = new MultiGraphCanvas(graphRepository);
+		multiGraphCanvas = new MultiGraphCanvas(graphRepository, Arrays.asList(
+			Arrays.asList(
+				"carPhysicsPacket.property.unfilteredThrottle",
+				"carPhysicsPacket.property.unfilteredBrake",
+				"carPhysicsPacket.property.unfilteredClutch",
+				"carPhysicsPacket.property.throttle",
+				"carPhysicsPacket.property.brake",
+				"carPhysicsPacket.property.clutch"
+			),
+			Arrays.asList(
+				"carPhysicsPacket.property.unfilteredSteering",
+				"carPhysicsPacket.property.steering"
+			)
+		));
 
 		DatagramSocket socket = new DatagramSocket(5606);
 		new Thread(new UDPReceiver(socket, new UDPListener() {

@@ -61,4 +61,8 @@ public class LookupRepository<Key, Type> implements Repository<Type> {
 	public Stream<Type> getItemStream() {
 		return items.values().stream();
 	}
+
+	public Type getItem(Key key) {
+		return items.get(key);
+	}
 }
