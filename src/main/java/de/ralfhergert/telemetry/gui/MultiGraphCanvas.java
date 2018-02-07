@@ -41,7 +41,7 @@ public class MultiGraphCanvas extends JPanel {
 		lookupRepository = new LookupRepository<>((graph) -> String.valueOf(graph.getProperty("name", "")));
 		new RepositoryConnector<>(repository, lookupRepository);
 
-		addLineGraphAction = new AbstractAction(ResourceBundle.getBundle("messages").getString("multiGraphCanvas.action.addFurtherGraphCanvas")) {
+		addLineGraphAction = new AbstractAction(ResourceBundle.getBundle("messages").getString("multiGraphCanvas.action.addGraphCanvas")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				GraphCanvas graphCanvas = new GraphCanvas();
@@ -55,9 +55,7 @@ public class MultiGraphCanvas extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.isPopupTrigger()) {
-					JPopupMenu popup = new JPopupMenu();
-					popup.add(new JMenuItem(addLineGraphAction));
-					popup.show(e.getComponent(), e.getX(), e.getY());
+					createPopupFor(e.getComponent()).show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		};
@@ -82,5 +80,32 @@ public class MultiGraphCanvas extends JPanel {
 
 	protected GridBagConstraints createLayoutConstraints() {
 		return new GridBagConstraints(0,-1,1,1,1,1,GridBagConstraints.CENTER,GridBagConstraints.BOTH, new Insets(5,5,5,5), 0, 0);
+	}
+
+	public JPopupMenu createPopupFor(Component component) {
+		JPopupMenu popupMenu = new JPopupMenu();
+		popupMenu.add(new JMenuItem(addLineGraphAction));
+		if (component instanceof GraphCanvas) {
+			popupMenu.add(new JMenuItem(new RemoveGraphCanvasAction(this, (GraphCanvas)component)));
+		}
+		return popupMenu;
+	}
+
+	public static class RemoveGraphCanvasAction extends AbstractAction {
+
+		private final MultiGraphCanvas multiGraphCanvas;
+		private final GraphCanvas graphCanvas;
+
+		public RemoveGraphCanvasAction(MultiGraphCanvas multiGraphCanvas, GraphCanvas graphCanvas) {
+			super(ResourceBundle.getBundle("messages").getString("multiGraphCanvas.action.removeGraphCanvas"));
+			this.multiGraphCanvas = multiGraphCanvas;
+			this.graphCanvas = graphCanvas;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			multiGraphCanvas.remove(graphCanvas);
+			multiGraphCanvas.revalidate();
+		}
 	}
 }
