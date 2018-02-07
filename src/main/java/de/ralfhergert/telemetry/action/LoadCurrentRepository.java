@@ -39,7 +39,7 @@ public class LoadCurrentRepository extends AbstractAction {
 		fileChooser.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File f) {
-				return f.getName().toLowerCase().endsWith(".pc2td");
+				return f.isDirectory() || f.getName().toLowerCase().endsWith(".pc2td");
 			}
 
 			@Override
