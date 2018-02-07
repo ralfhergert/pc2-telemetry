@@ -98,11 +98,25 @@ public class Telemetry {
 	}
 
 	public static void main(String... args) throws IOException {
+		tryToSetNimbusLookAndFeel();
 		final Telemetry app = new Telemetry();
 		final TelemetryFrame frame = new TelemetryFrame(app);
 
 		frame.getContentPane().add(new JScrollPane(app.getGraphCanvas()), BorderLayout.CENTER);
 		frame.setSize(720,480);
 		frame.setVisible(true);
+	}
+
+	public static void tryToSetNimbusLookAndFeel() {
+		try { // search for the Nimbus LnF and set it.
+			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					return;
+				}
+			}
+		} catch (Exception e) {
+			/* do nothing - stick to the default */
+		}
 	}
 }
