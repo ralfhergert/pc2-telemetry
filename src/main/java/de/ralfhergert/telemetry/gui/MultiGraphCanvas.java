@@ -1,5 +1,6 @@
 package de.ralfhergert.telemetry.gui;
 
+import de.ralfhergert.telemetry.action.AddLineGraphToGraphCanvasAction;
 import de.ralfhergert.telemetry.action.ChangeLineGraphColorAction;
 import de.ralfhergert.telemetry.action.RemoveLineGraphFromGraphCanvasAction;
 import de.ralfhergert.telemetry.graph.LineGraph;
@@ -8,6 +9,7 @@ import de.ralfhergert.telemetry.repository.Repository;
 import de.ralfhergert.telemetry.repository.RepositoryConnector;
 
 import javax.swing.*;
+import java.util.Collections;
 import java.util.List;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,6 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * This panel groups multiple {@link GraphCanvas}.
@@ -93,12 +96,23 @@ public class MultiGraphCanvas extends JPanel {
 		popupMenu.add(new JPopupMenu.Separator());
 		if (component instanceof GraphCanvas) {
 			GraphCanvas<?,?,?> graphCanvas = (GraphCanvas<?,?,?>)component;
+			List<LineGraph> lineGraphsNotShown = lookupRepository.getItemStream().collect(Collectors.toList());
 			graphCanvas.getGraphs().forEach((lineGraph) -> {
+				lineGraphsNotShown.remove(lineGraph);
 				JMenu graphMenu = new JMenu(String.valueOf(lineGraph.getProperty("name", "no name")));
 				graphMenu.add(new JMenuItem(new RemoveLineGraphFromGraphCanvasAction(lineGraph, graphCanvas).withCaption(ResourceBundle.getBundle("messages").getString("generic.remove"))));
 				graphMenu.add(new JMenuItem(new ChangeLineGraphColorAction(this, lineGraph)));
 				popupMenu.add(graphMenu);
 			});
+			if (!lineGraphsNotShown.isEmpty()) {
+				popupMenu.add(new JPopupMenu.Separator());
+				Collections.sort(lineGraphsNotShown, (g1,g2) -> ((String)g2.getProperty("name", "no name")).compareTo((String)g1.getProperty("name", "no name")));
+				JMenu graphMenu = new JMenu(ResourceBundle.getBundle("messages").getString("multiGraphCanvas.action.addLineGraphToCanvas"));
+				lineGraphsNotShown.forEach((lineGraph) -> {
+					graphMenu.add(new JMenuItem(new AddLineGraphToGraphCanvasAction(lineGraph, graphCanvas).withCaption(String.valueOf(lineGraph.getProperty("name", "no name")))));
+				});
+				popupMenu.add(graphMenu);
+			}
 		}
 		return popupMenu;
 	}
