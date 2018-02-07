@@ -1,5 +1,6 @@
 package de.ralfhergert.telemetry.gui;
 
+import de.ralfhergert.telemetry.action.RemoveLineGraphFromGraphCanvasAction;
 import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.repository.LookupRepository;
 import de.ralfhergert.telemetry.repository.Repository;
@@ -87,6 +88,15 @@ public class MultiGraphCanvas extends JPanel {
 		popupMenu.add(new JMenuItem(addLineGraphAction));
 		if (component instanceof GraphCanvas) {
 			popupMenu.add(new JMenuItem(new RemoveGraphCanvasAction(this, (GraphCanvas)component)));
+		}
+		popupMenu.add(new JPopupMenu.Separator());
+		if (component instanceof GraphCanvas) {
+			GraphCanvas<?,?,?> graphCanvas = (GraphCanvas<?,?,?>)component;
+			graphCanvas.getGraphs().forEach((lineGraph) -> {
+				JMenu graphMenu = new JMenu(String.valueOf(lineGraph.getProperty("name", "no name")));
+				graphMenu.add(new JMenuItem(new RemoveLineGraphFromGraphCanvasAction(lineGraph, graphCanvas).withCaption(ResourceBundle.getBundle("messages").getString("generic.remove"))));
+				popupMenu.add(graphMenu);
+			});
 		}
 		return popupMenu;
 	}
