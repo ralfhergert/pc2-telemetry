@@ -41,7 +41,7 @@ public class LookupRepository<Key, Type> implements Repository<Type> {
 		if (item == null) {
 			throw new IllegalArgumentException("item can not be null");
 		}
-		if (items.containsValue(item)) {
+		if (!items.containsValue(item)) {
 			items.put(accessor.getValue(item), item);
 			listeners.forEach(listener -> listener.onItemAdded(this, item, null, null));
 		}
@@ -54,6 +54,17 @@ public class LookupRepository<Key, Type> implements Repository<Type> {
 		}
 		if (items.remove(accessor.getValue(item), item)) {
 			listeners.forEach(listener -> listener.onItemRemoved(this, item));
+		}
+		return this;
+	}
+
+	public LookupRepository<Key,Type> removeItemByKey(Key key) {
+		if (key == null) {
+			throw new IllegalArgumentException("key can not be null");
+		}
+		final Type removedItem = items.remove(key);
+		if (removedItem != null) {
+			listeners.forEach(listener -> listener.onItemRemoved(this, removedItem));
 		}
 		return this;
 	}
