@@ -18,12 +18,12 @@ import java.util.jar.JarInputStream;
  * This action will prompt a save dialog. When approved the application's current
  * repository will be stored in the chosen file.
  */
-public class LoadCurrentRepository extends AbstractAction {
+public class LoadCurrentRepositoryAction extends AbstractAction {
 
 	private Telemetry application;
 	private Component parent;
 
-	public LoadCurrentRepository(Telemetry application, Component parent) {
+	public LoadCurrentRepositoryAction(Telemetry application, Component parent) {
 		super(ResourceBundle.getBundle("messages").getString("action.loadCurrentRepository.caption"));
 		this.application = application;
 		this.parent = parent;

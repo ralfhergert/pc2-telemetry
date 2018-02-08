@@ -21,12 +21,12 @@ import java.util.zip.ZipEntry;
  * This action will prompt a save dialog. When approved the application's current
  * repository will be stored in the chosen file.
  */
-public class SaveCurrentRepository extends AbstractAction {
+public class SaveCurrentRepositoryAction extends AbstractAction {
 
 	private Telemetry application;
 	private Component parent;
 
-	public SaveCurrentRepository(Telemetry application, Component parent) {
+	public SaveCurrentRepositoryAction(Telemetry application, Component parent) {
 		super(ResourceBundle.getBundle("messages").getString("action.saveCurrentRepository.caption"));
 		this.application = application;
 		this.parent = parent;

@@ -1,8 +1,8 @@
 package de.ralfhergert.telemetry;
 
-import de.ralfhergert.telemetry.action.LoadCurrentRepository;
+import de.ralfhergert.telemetry.action.LoadCurrentRepositoryAction;
 import de.ralfhergert.telemetry.action.OpenWebLinkAction;
-import de.ralfhergert.telemetry.action.SaveCurrentRepository;
+import de.ralfhergert.telemetry.action.SaveCurrentRepositoryAction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,8 +26,8 @@ public class TelemetryFrame extends JFrame {
 		JMenuBar mainMenu = new JMenuBar();
 		{ // create the file menu
 			JMenu fileMenu = new JMenu(ResourceBundle.getBundle("messages").getString("mainMenu.file.caption"));
-			fileMenu.add(new LoadCurrentRepository(application, this));
-			fileMenu.add(new SaveCurrentRepository(application, this));
+			fileMenu.add(new LoadCurrentRepositoryAction(application, this));
+			fileMenu.add(new SaveCurrentRepositoryAction(application, this));
 			mainMenu.add(fileMenu);
 		}
 		{ // create the help menu
