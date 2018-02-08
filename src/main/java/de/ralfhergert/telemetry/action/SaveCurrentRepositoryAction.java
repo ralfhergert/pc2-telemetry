@@ -23,6 +23,8 @@ import java.util.zip.ZipEntry;
  */
 public class SaveCurrentRepositoryAction extends AbstractAction {
 
+	private static final String LAST_USED_DIRECTORY_PROPERTY_NAME = "SaveCurrentRepositoryAction.lastUsedDirectory";
+
 	private Telemetry application;
 	private Component parent;
 
@@ -39,6 +41,13 @@ public class SaveCurrentRepositoryAction extends AbstractAction {
 			return;
 		}
 		JFileChooser fileChooser = new JFileChooser();
+		// try to initialize the file chooser on the last used directory.
+		if (application.getProperties().getProperty(LAST_USED_DIRECTORY_PROPERTY_NAME) != null) {
+			File lastUsedDirectory = new File(application.getProperties().getProperty(LAST_USED_DIRECTORY_PROPERTY_NAME));
+			if (lastUsedDirectory.exists()) {
+				fileChooser.setCurrentDirectory(lastUsedDirectory);
+			}
+		}
 		fileChooser.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File f) {
@@ -54,6 +63,7 @@ public class SaveCurrentRepositoryAction extends AbstractAction {
 		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			try {
 				writeAsJarFile(repository, new FileOutputStream(fileChooser.getSelectedFile()));
+				application.getProperties().setProperty(LAST_USED_DIRECTORY_PROPERTY_NAME, fileChooser.getCurrentDirectory().getAbsolutePath());
 			} catch (IOException e) {
 				// TODO prompt a warning.
 			}
