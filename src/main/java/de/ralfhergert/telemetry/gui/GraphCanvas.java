@@ -94,6 +94,9 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 		}
 		g.translate(0, getHeight());
 		g.scale(getWidth() / pathBounds.getWidth(), -getHeight() / pathBounds.getHeight());
+		// use a stroke which compensates for the scaling.
+		// TODO use a stroke which uses separate thicknesses for x and y.
+		g.setStroke(new BasicStroke(2f * (float)(pathBounds.getHeight() / getHeight())));
 		g.translate(0, -pathBounds.getMinY());
 		{ // render line at y = 0
 			g.setColor(zeroLineColor);
