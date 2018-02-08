@@ -11,21 +11,20 @@ public class PropertyValues {
 	private final Map<String, PropertyValue<?>> propertyValueMap = new HashMap<>();
 
 	/**
-	 * This method makes sure that a property with the given name does exist.
-	 * If it exists, the listener is registered and the defaultValue is ignored.
-	 * If if does not exist then a property with the given defaultValue is created
-	 * and the listener is registered.
+	 * This method makes sure that a property with that name and value does exist.
+	 * If a listener is given it will be registered at the property.
+	 * @param propertyName name of the property
 	 */
-	public <Type> PropertyValues ensureProperty(String propertyName, Type defaultValue, PropertyValueListener<Type> listener) {
+	public <Type> PropertyValues ensureProperty(String propertyName, Type value, PropertyValueListener<Type> listener) {
 		PropertyValue<Type> propertyValue = (PropertyValue<Type>)propertyValueMap.get(propertyName);
-		if (propertyValue != null) {
-			propertyValue.addListener(listener);
-		} else {
-			propertyValue = new PropertyValue<>(defaultValue);
-			if (listener != null) {
-				propertyValue.addListener(listener);
-			}
+		if (propertyValue == null) { // create this value if not yet defined
+			propertyValue = new PropertyValue<>(value);
 			propertyValueMap.put(propertyName, propertyValue);
+		} else {
+			propertyValue.setValue(value);
+		}
+		if (listener != null) {
+			propertyValue.addListener(listener);
 		}
 		return this;
 	}
