@@ -90,6 +90,10 @@ public class Telemetry {
 		return multiGraphCanvas;
 	}
 
+	public ApplicationProperties getProperties() {
+		return properties;
+	}
+
 	/**
 	 * This method performs last operation when shutting down the app.
 	 */
