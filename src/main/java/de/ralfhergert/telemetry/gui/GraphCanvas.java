@@ -97,7 +97,7 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 		g.translate(0, -pathBounds.getMinY());
 		{ // render line at y = 0
 			g.setColor(zeroLineColor);
-			g.drawLine(0, 0, getWidth(), 0);
+			g.drawLine(0, 0, (int)pathBounds.getWidth(), 0);
 		}
 
 		for (LineGraph<Item, Key,Value> graph : graphs) {
