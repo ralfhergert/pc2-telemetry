@@ -45,7 +45,7 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 		if (!graphs.contains(graph)) {
 			graphs.add(graph);
 			graph.addListener(this);
-			graph.getPropertyValues().ensureProperty("color", Color.WHITE, (p,o,n) -> this.repaint());
+			graph.getPropertyValues().addListener("color", (p,o,n) -> this.repaint());
 		}
 		return this;
 	}

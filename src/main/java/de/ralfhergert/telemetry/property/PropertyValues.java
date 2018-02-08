@@ -11,20 +11,29 @@ public class PropertyValues {
 	private final Map<String, PropertyValue<?>> propertyValueMap = new HashMap<>();
 
 	/**
-	 * This method makes sure that a property with that name and value does exist.
-	 * If a listener is given it will be registered at the property.
-	 * @param propertyName name of the property
+	 * This method will add a listener for the property matching propertyName.
+	 * If this property does not yet exist, it will be created.
 	 */
-	public <Type> PropertyValues ensureProperty(String propertyName, Type value, PropertyValueListener<Type> listener) {
+	public <Type> PropertyValues addListener(String propertyName, PropertyValueListener<Type> listener) {
 		PropertyValue<Type> propertyValue = (PropertyValue<Type>)propertyValueMap.get(propertyName);
-		if (propertyValue == null) { // create this value if not yet defined
-			propertyValue = new PropertyValue<>(value);
+		if (propertyValue == null) {
+			propertyValue = new PropertyValue<>(null);
 			propertyValueMap.put(propertyName, propertyValue);
-		} else {
-			propertyValue.setValue(value);
 		}
 		if (listener != null) {
 			propertyValue.addListener(listener);
+		}
+		return this;
+	}
+
+	/**
+	 * This method will add a listener for the property matching propertyName.
+	 * If this property does not yet exist, it will be created.
+	 */
+	public <Type> PropertyValues removeListener(String propertyName, PropertyValueListener<Type> listener) {
+		PropertyValue<Type> propertyValue = (PropertyValue<Type>)propertyValueMap.get(propertyName);
+		if (propertyValue != null) {
+			propertyValue.removeListener(listener);
 		}
 		return this;
 	}
@@ -42,6 +51,8 @@ public class PropertyValues {
 		PropertyValue<Type> propertyValue = (PropertyValue<Type>)propertyValueMap.get(propertyName);
 		if (propertyValue != null) {
 			propertyValue.setValue(value);
+		} else { // create this property if it does not yet exist.
+			propertyValueMap.put(propertyName, new PropertyValue<>(value));
 		}
 		return this;
 	}

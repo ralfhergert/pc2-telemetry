@@ -102,7 +102,7 @@ public class LineGraph<Item, Key extends Number, Value extends Number> implement
 	}
 
 	public <Type> LineGraph<Item, Key, Value> setProperty(final String propertyName, Type value) {
-		propertyValues.ensureProperty(propertyName, value, null);
+		propertyValues.setValue(propertyName, value);
 		return this;
 	}
 
