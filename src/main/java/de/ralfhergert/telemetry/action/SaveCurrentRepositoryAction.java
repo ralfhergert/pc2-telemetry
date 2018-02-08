@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -59,7 +61,7 @@ public class SaveCurrentRepositoryAction extends AbstractAction {
 				return ResourceBundle.getBundle("messages").getString("fileName.pc2td.caption");
 			}
 		});
-		fileChooser.setSelectedFile(new File("capture.pc2td"));
+		fileChooser.setSelectedFile(new File(new SimpleDateFormat("'capture.'yyyyMMddHHmm'.pc2td'").format(new Date())));
 		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			try {
 				writeAsJarFile(repository, new FileOutputStream(fileChooser.getSelectedFile()));
