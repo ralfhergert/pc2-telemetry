@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * This panel groups multiple {@link GraphCanvas}.
  */
-public class MultiGraphCanvas extends JPanel {
+public class MultiGraphCanvas extends JPanel implements Scrollable {
 
 	private final LookupRepository<String,LineGraph> lookupRepository;
 
@@ -115,6 +115,31 @@ public class MultiGraphCanvas extends JPanel {
 			}
 		}
 		return popupMenu;
+	}
+
+	@Override
+	public Dimension getPreferredScrollableViewportSize() {
+		return null;
+	}
+
+	@Override
+	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+		return 10;
+	}
+
+	@Override
+	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+		return 10;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportWidth() {
+		return false;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportHeight() {
+		return true;
 	}
 
 	public static class RemoveGraphCanvasAction extends AbstractAction {
