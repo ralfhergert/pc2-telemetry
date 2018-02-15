@@ -59,11 +59,15 @@ public class Telemetry {
 				"carPhysicsPacket.property.unfilteredClutch",
 				"carPhysicsPacket.property.throttle",
 				"carPhysicsPacket.property.brake",
-				"carPhysicsPacket.property.clutch"
+				"carPhysicsPacket.property.clutch",
+				"carPhysicsPacket.property.handBrake"
 			),
 			Arrays.asList(
 				"carPhysicsPacket.property.unfilteredSteering",
 				"carPhysicsPacket.property.steering"
+			),
+			Arrays.asList(
+				"carPhysicsPacket.property.speed"
 			)
 		));
 
