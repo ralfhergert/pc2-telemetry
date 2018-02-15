@@ -41,7 +41,7 @@ public class MultiGraphCanvas extends JPanel implements Scrollable {
 	 */
 	public MultiGraphCanvas(Repository<LineGraph> repository, List<List<String>> initialConfig) {
 		super(new GridBagLayout());
-		setBackground(Color.LIGHT_GRAY);
+		setBackground(new Color(100, 100, 100));
 
 		lookupRepository = new LookupRepository<>((graph) -> String.valueOf(graph.getProperty("name", "")));
 		new RepositoryConnector<>(repository, lookupRepository);
