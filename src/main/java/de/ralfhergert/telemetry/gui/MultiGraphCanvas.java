@@ -9,7 +9,6 @@ import de.ralfhergert.telemetry.repository.Repository;
 import de.ralfhergert.telemetry.repository.RepositoryConnector;
 
 import javax.swing.*;
-import java.util.Collections;
 import java.util.List;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -106,7 +105,7 @@ public class MultiGraphCanvas extends JPanel implements Scrollable {
 			});
 			if (!lineGraphsNotShown.isEmpty()) {
 				popupMenu.add(new JPopupMenu.Separator());
-				Collections.sort(lineGraphsNotShown, (g1,g2) -> ((String)g2.getProperty("name", "no name")).compareTo((String)g1.getProperty("name", "no name")));
+				lineGraphsNotShown.sort((g1, g2) -> ((String) g2.getProperty("name", "no name")).compareTo((String) g1.getProperty("name", "no name")));
 				JMenu graphMenu = new JMenu(ResourceBundle.getBundle("messages").getString("multiGraphCanvas.action.addLineGraphToCanvas"));
 				lineGraphsNotShown.forEach((lineGraph) -> {
 					graphMenu.add(new JMenuItem(new AddLineGraphToGraphCanvasAction(lineGraph, graphCanvas).withCaption(String.valueOf(lineGraph.getProperty("name", "no name")))));
