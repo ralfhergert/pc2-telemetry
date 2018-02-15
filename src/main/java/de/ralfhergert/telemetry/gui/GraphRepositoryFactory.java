@@ -2,6 +2,7 @@ package de.ralfhergert.telemetry.gui;
 
 import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.graph.NegativeOffsetAccessor;
+import de.ralfhergert.telemetry.pc2.datagram.Vector;
 import de.ralfhergert.telemetry.reflection.*;
 import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPacket;
 import de.ralfhergert.telemetry.repository.IndexedRepository;
@@ -32,7 +33,7 @@ public class GraphRepositoryFactory {
 	public Repository<LineGraph> createLineGraphs(IndexedRepository<CarPhysicsPacket> carPhysicRepository, NegativeOffsetAccessor<CarPhysicsPacket, ? extends Number> keyAccessor, CarPhysicsPacket sampleItem) {
 		final Repository<LineGraph> graphRepository = new ItemRepository<>();
 
-		final List<PropertyInfo<CarPhysicsPacket>> propertyInfoList = new ArrayList<>();
+		final List<PropertyInfo<CarPhysicsPacket,?>> propertyInfoList = new ArrayList<>();
 		// use reflection to iterate over all fields and compare them.
 		for (Field field : CarPhysicsPacket.class.getFields()) {
 			propertyInfoList.add(new PropertyInfo<>(field.getName(), field.getType(), new FieldAccessor<>(field)));
@@ -43,7 +44,7 @@ public class GraphRepositoryFactory {
 				propertyInfoList.add(new PropertyInfo<>(propertyName, method.getReturnType(), new MethodAccessor<>(method)));
 			}
 		}
-		for (PropertyInfo<CarPhysicsPacket> propertyInfo : propertyInfoList) {
+		for (PropertyInfo<CarPhysicsPacket,?> propertyInfo : propertyInfoList) {
 			if (propertyInfo.getPropertyType().isArray()) {
 				if (!isNumber(propertyInfo.getPropertyType().getComponentType())) {
 					continue; // skip this field if its not a number.
@@ -59,13 +60,20 @@ public class GraphRepositoryFactory {
 							.setProperty("color", graphColors.containsKey(graphName) ? decode(graphColors.getString(graphName)) : Color.LIGHT_GRAY)
 					);
 				}
-			} else {
-				if (!isNumber(propertyInfo.getPropertyType())) {
-					continue; // skip this method.
-				}
+			} else if (isNumber(propertyInfo.getPropertyType())) {
 				final String graphName = "carPhysicsPacket.property." + propertyInfo.getPropertyName();
 				graphRepository.addItem(
-					new LineGraph<>(carPhysicRepository, keyAccessor, propertyInfo.getPropertyAccessor())
+					new LineGraph<>(carPhysicRepository, keyAccessor, (Accessor<CarPhysicsPacket, Number>)propertyInfo.getPropertyAccessor())
+						.setProperty("name", graphName)
+						.setProperty("color", graphColors.containsKey(graphName) ? decode(graphColors.getString(graphName)) : Color.LIGHT_GRAY)
+				);
+			} else if (Vector.class.isAssignableFrom(propertyInfo.getPropertyType())) {
+				final String graphName = "carPhysicsPacket.property." + propertyInfo.getPropertyName() + ".length";
+				graphRepository.addItem(
+					new LineGraph<>(carPhysicRepository, keyAccessor, (Accessor<CarPhysicsPacket, Number>) carPhysicsPacket -> {
+						Vector v = (Vector)propertyInfo.getPropertyAccessor().getValue(carPhysicsPacket);
+						return (v != null) ? v.length() : 0;
+					})
 						.setProperty("name", graphName)
 						.setProperty("color", graphColors.containsKey(graphName) ? decode(graphColors.getString(graphName)) : Color.LIGHT_GRAY)
 				);

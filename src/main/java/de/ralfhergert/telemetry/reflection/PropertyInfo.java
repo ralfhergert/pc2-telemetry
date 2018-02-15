@@ -8,13 +8,13 @@ package de.ralfhergert.telemetry.reflection;
  *   <li>accessor and</li>
  * </ul>
  */
-public class PropertyInfo<Item> {
+public class PropertyInfo<Item, Type> {
 
 	private final String propertyName;
-	private final Class propertyType;
-	private final Accessor<Item, Number> propertyAccessor;
+	private final Class<Type> propertyType;
+	private final Accessor<Item, Type> propertyAccessor;
 
-	public PropertyInfo(String propertyName, Class propertyType, Accessor<Item, Number> propertyAccessor) {
+	public PropertyInfo(String propertyName, Class<Type> propertyType, Accessor<Item, Type> propertyAccessor) {
 		this.propertyName = propertyName;
 		this.propertyType = propertyType;
 		this.propertyAccessor = propertyAccessor;
@@ -28,7 +28,7 @@ public class PropertyInfo<Item> {
 		return propertyType;
 	}
 
-	public Accessor<Item, Number> getPropertyAccessor() {
+	public Accessor<Item, Type> getPropertyAccessor() {
 		return propertyAccessor;
 	}
 

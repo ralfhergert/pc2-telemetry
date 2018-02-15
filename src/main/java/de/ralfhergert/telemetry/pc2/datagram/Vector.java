@@ -20,6 +20,14 @@ public class Vector {
 		return values[index];
 	}
 
+	public double length() {
+		double sum = 0;
+		for (float value : values) {
+			sum += value * value;
+		}
+		return Math.sqrt(sum);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
