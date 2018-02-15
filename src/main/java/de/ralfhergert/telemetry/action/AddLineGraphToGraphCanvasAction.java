@@ -22,6 +22,7 @@ public class AddLineGraphToGraphCanvasAction extends AbstractAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		graphCanvas.addGraph(lineGraph);
+		graphCanvas.revalidate();
 	}
 
 	public AddLineGraphToGraphCanvasAction withCaption(String caption) {

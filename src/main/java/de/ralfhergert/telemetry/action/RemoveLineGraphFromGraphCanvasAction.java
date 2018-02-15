@@ -22,6 +22,7 @@ public class RemoveLineGraphFromGraphCanvasAction extends AbstractAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		graphCanvas.removeGraph(lineGraph);
+		graphCanvas.revalidate();
 	}
 
 	public RemoveLineGraphFromGraphCanvasAction withCaption(String caption) {
