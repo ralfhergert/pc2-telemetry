@@ -4,21 +4,15 @@ import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.gui.GraphRepositoryFactory;
 import de.ralfhergert.telemetry.gui.MultiGraphCanvas;
 import de.ralfhergert.telemetry.graph.NegativeOffsetAccessor;
-import de.ralfhergert.telemetry.pc2.UDPListener;
-import de.ralfhergert.telemetry.pc2.UDPReceiver;
-import de.ralfhergert.telemetry.pc2.datagram.v2.BasePacket;
+import de.ralfhergert.telemetry.pc2.UDPCaptureThread;
 import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPacket;
-import de.ralfhergert.telemetry.pc2.datagram.v2.PacketParser;
 import de.ralfhergert.telemetry.repository.IndexedRepository;
 import de.ralfhergert.telemetry.repository.Repository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.Arrays;
@@ -29,11 +23,9 @@ import java.util.Comparator;
  */
 public class Telemetry {
 
-	private static final Logger logger = LoggerFactory.getLogger(Telemetry.class);
-	private static final PacketParser parser = new PacketParser();
-
 	private final ApplicationProperties properties;
 
+	private DatagramSocket socket = null;
 	private IndexedRepository<CarPhysicsPacket> currentRepository;
 	private Repository<LineGraph> graphRepository;
 
@@ -71,19 +63,28 @@ public class Telemetry {
 			)
 		));
 
-		DatagramSocket socket = new DatagramSocket(5606);
-		new Thread(new UDPReceiver(socket, new UDPListener() {
-			@Override
-			public void received(DatagramPacket packet) {
-				BasePacket basePacket = parser.parse(packet);
-				if (basePacket == null) {
-					logger.info("Received unknown message: {}", new BasePacket(packet.getData()));
-				} else if (basePacket instanceof CarPhysicsPacket) {
-					CarPhysicsPacket carPhysicsPacket = (CarPhysicsPacket) basePacket;
-					currentRepository.addItem(carPhysicsPacket);
-				}
-			}
-		})).start();
+		// try to create a socket and start listening
+		try {
+			new UDPCaptureThread(createSocket(), currentRepository).start();
+		} catch (SocketException se) {
+			// no capture started.
+		}
+	}
+
+	public DatagramSocket getSocket() {
+		return socket;
+	}
+
+	/**
+	 * This method will either return the current socket, if it is still connected.
+	 * Or else it try to create a new socket. This might fail due to resource conflicts.
+	 */
+	public DatagramSocket createSocket() throws SocketException {
+		if (socket != null && socket.isConnected()) {
+			return socket;
+		}
+		socket = new DatagramSocket(Integer.valueOf(properties.getProperty("projectCars2.udp.port", "5606")));
+		return socket;
 	}
 
 	public IndexedRepository<CarPhysicsPacket> getCurrentRepository() {

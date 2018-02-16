@@ -32,6 +32,10 @@ public class ApplicationProperties {
 		return properties.getProperty(key);
 	}
 
+	public String getProperty(String key, String defaultValue) {
+		return properties.containsKey(key) ? properties.getProperty(key) : defaultValue;
+	}
+
 	public void setProperty(String key, String value) {
 		properties.setProperty(key, value);
 	}
