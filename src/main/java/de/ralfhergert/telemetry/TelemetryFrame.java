@@ -1,11 +1,6 @@
 package de.ralfhergert.telemetry;
 
-import de.ralfhergert.telemetry.action.LoadCurrentRepositoryAction;
-import de.ralfhergert.telemetry.action.OpenWebLinkAction;
-import de.ralfhergert.telemetry.action.SaveCurrentRepositoryAction;
-import de.ralfhergert.telemetry.notification.Notification;
-import de.ralfhergert.telemetry.notification.NotificationCache;
-import de.ralfhergert.telemetry.notification.NotificationListener;
+import de.ralfhergert.telemetry.action.*;
 import de.ralfhergert.telemetry.util.MessageFormatter;
 
 import javax.swing.*;
@@ -33,6 +28,9 @@ public class TelemetryFrame extends JFrame {
 			JMenu fileMenu = new JMenu(ResourceBundle.getBundle("messages").getString("mainMenu.file.caption"));
 			fileMenu.add(new LoadCurrentRepositoryAction(application, this));
 			fileMenu.add(new SaveCurrentRepositoryAction(application, this));
+			fileMenu.addSeparator();
+			fileMenu.add(new StartCapturingAction(application));
+			fileMenu.add(new StopCapturingAction(application));
 			mainMenu.add(fileMenu);
 		}
 		{ // create the help menu

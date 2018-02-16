@@ -34,6 +34,7 @@ public class Telemetry {
 	private Repository<LineGraph> graphRepository;
 
 	private MultiGraphCanvas multiGraphCanvas;
+	private UDPCaptureThread udpCaptureThread = null;
 
 	public Telemetry() throws SocketException {
 		properties = new ApplicationProperties(new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".PC2Telemetry", "defaults.ini"));
@@ -67,13 +68,37 @@ public class Telemetry {
 			)
 		));
 
+		startCapturing();
+	}
+
+	public void startCapturing() {
+		if (udpCaptureThread != null && udpCaptureThread.isRunning()) {
+			return;
+		}
 		// try to create a socket and start listening
 		try {
-			new UDPCaptureThread(createSocket(), currentRepository).start();
+			udpCaptureThread = new UDPCaptureThread(createSocket(), currentRepository).start();
 			notificationCache.sendNotification(new CaptureThreadNotification(true));
 		} catch (SocketException se) {
 			notificationCache.sendNotification(new CaptureThreadNotification(false));
 		}
+	}
+
+	public void stopCapturing() {
+		// stop and release the capture thread.
+		if (udpCaptureThread != null) {
+			if (udpCaptureThread.isRunning()) {
+				udpCaptureThread.stop(); // this will just send a stop signal.
+			}
+			udpCaptureThread = null;
+		}
+		// close and release the DatagramSocket.
+		if (socket != null) {
+			socket.close(); /* closing the socket will create a SocketException in the
+			 * UDPReceiver inside the UDPCaptureThread. */
+			socket = null;
+		}
+		notificationCache.sendNotification(new CaptureThreadNotification(false));
 	}
 
 	public NotificationCache getNotificationCache() {
