@@ -4,6 +4,8 @@ import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.gui.GraphRepositoryFactory;
 import de.ralfhergert.telemetry.gui.MultiGraphCanvas;
 import de.ralfhergert.telemetry.graph.NegativeOffsetAccessor;
+import de.ralfhergert.telemetry.notification.Notification;
+import de.ralfhergert.telemetry.notification.NotificationCache;
 import de.ralfhergert.telemetry.pc2.UDPCaptureThread;
 import de.ralfhergert.telemetry.pc2.datagram.v2.CarPhysicsPacket;
 import de.ralfhergert.telemetry.repository.IndexedRepository;
@@ -24,6 +26,8 @@ import java.util.Comparator;
 public class Telemetry {
 
 	private final ApplicationProperties properties;
+
+	private final NotificationCache notificationCache = new NotificationCache();
 
 	private DatagramSocket socket = null;
 	private IndexedRepository<CarPhysicsPacket> currentRepository;
@@ -66,9 +70,14 @@ public class Telemetry {
 		// try to create a socket and start listening
 		try {
 			new UDPCaptureThread(createSocket(), currentRepository).start();
+			notificationCache.sendNotification(new CaptureThreadNotification(true));
 		} catch (SocketException se) {
-			// no capture started.
+			notificationCache.sendNotification(new CaptureThreadNotification(false));
 		}
+	}
+
+	public NotificationCache getNotificationCache() {
+		return notificationCache;
 	}
 
 	public DatagramSocket getSocket() {
@@ -126,6 +135,26 @@ public class Telemetry {
 			}
 		} catch (Exception e) {
 			/* do nothing - stick to the default */
+		}
+	}
+
+	public static class CaptureThreadNotification implements Notification {
+
+		private boolean isCapturing;
+
+		public CaptureThreadNotification(boolean isCapturing) {
+			this.isCapturing = isCapturing;
+		}
+
+		public boolean isCapturing() {
+			return isCapturing;
+		}
+
+		@Override
+		public String toString() {
+			return "CaptureThreadNotification{" +
+				"isCapturing=" + isCapturing +
+				'}';
 		}
 	}
 }

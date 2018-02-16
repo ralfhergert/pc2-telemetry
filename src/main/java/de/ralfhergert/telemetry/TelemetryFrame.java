@@ -3,12 +3,17 @@ package de.ralfhergert.telemetry;
 import de.ralfhergert.telemetry.action.LoadCurrentRepositoryAction;
 import de.ralfhergert.telemetry.action.OpenWebLinkAction;
 import de.ralfhergert.telemetry.action.SaveCurrentRepositoryAction;
+import de.ralfhergert.telemetry.notification.Notification;
+import de.ralfhergert.telemetry.notification.NotificationCache;
+import de.ralfhergert.telemetry.notification.NotificationListener;
+import de.ralfhergert.telemetry.util.MessageFormatter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URI;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 /**
@@ -41,6 +46,17 @@ public class TelemetryFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				application.shutdown();
+			}
+		});
+
+		// register notification listeners
+		application.getNotificationCache().addListener((cache, notification) -> {
+			if (notification instanceof Telemetry.CaptureThreadNotification) {
+				final String titlePattern = ResourceBundle.getBundle("messages").getString("application.title.withConnectionState");
+				final String state = ((Telemetry.CaptureThreadNotification)notification).isCapturing()
+					? ResourceBundle.getBundle("messages").getString("generic.connected")
+					: ResourceBundle.getBundle("messages").getString("generic.disconnected");
+				setTitle(new MessageFormatter().format(titlePattern, Collections.singletonMap("state", state)));
 			}
 		});
 	}
