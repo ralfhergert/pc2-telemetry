@@ -4,6 +4,7 @@ import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.graph.LineGraphListener;
 
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -114,15 +115,14 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 		if (pathBounds.getWidth() == 0 || pathBounds.getHeight() == 0) {
 			return; // nothing to draw
 		}
-		g.translate(0, getHeight());
-		g.scale(getWidth() / pathBounds.getWidth(), -getHeight() / pathBounds.getHeight());
-		// use a stroke which compensates for the scaling.
-		// TODO use a stroke which uses separate thicknesses for x and y.
-		g.setStroke(new BasicStroke(2f * (float)(pathBounds.getHeight() / getHeight())));
-		g.translate(0, -pathBounds.getMinY());
+		AffineTransform transform = AffineTransform.getTranslateInstance(0, getHeight());
+		transform.scale(getWidth() / pathBounds.getWidth(), -getHeight() / pathBounds.getHeight());
+		transform.translate(0, -pathBounds.getMinY());
 		{ // render line at y = 0
-			g.setColor(zeroLineColor);
-			g.drawLine(0, 0, (int)pathBounds.getWidth(), 0);
+			Graphics2D gClone = (Graphics2D)g.create();
+			gClone.setColor(zeroLineColor);
+			gClone.transform(transform);
+			gClone.drawLine(0, 0, (int)pathBounds.getWidth(), 0);
 		}
 
 		for (LineGraph<Item, Key,Value> graph : graphs) {
@@ -131,7 +131,7 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 				continue;
 			}
 			g.setColor(graph.getProperty("color", Color.WHITE));
-			g.draw(path);
+			g.draw(path.createTransformedShape(transform));
 		}
 	}
 
