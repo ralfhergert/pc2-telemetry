@@ -10,7 +10,7 @@ public class PacketParser {
 	public BasePacket parse(DatagramPacket packet) {
 		try {
 			BasePacket basePacket = new BasePacket(packet.getData());
-			if (basePacket.getPacketType() == PacketTypes.CarPhysics && basePacket.getPacketVersion() == 2) {
+			if (basePacket.getPacketType() == PacketTypes.CarPhysics && basePacket.getPacketVersion() == 3) {
 				return new CarPhysicsPacket(packet.getData());
 			} else {
 				return basePacket;

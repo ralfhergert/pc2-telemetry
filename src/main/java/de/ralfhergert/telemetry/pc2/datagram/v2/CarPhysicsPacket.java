@@ -88,8 +88,8 @@ public class CarPhysicsPacket extends BasePacket {
 		if (data.length < 556) {
 			throw new IllegalArgumentException("given data array is too short to be read as CarPhysicsPacket");
 		}
-		if (getPacketType() != PacketTypes.CarPhysics || getPacketVersion() != 2) {
-			throw new IllegalArgumentException("data does resemble a CarPhysics packet in version 2");
+		if (getPacketType() != PacketTypes.CarPhysics || getPacketVersion() > 3) {
+			throw new IllegalArgumentException("data does resemble a CarPhysics packet in version 2 or 3");
 		}
 		viewedParticipantIndex = data[12];
 		unfilteredThrottle = (short)Byte.toUnsignedInt(data[13]);
