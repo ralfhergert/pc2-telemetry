@@ -7,6 +7,7 @@ import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.repository.LookupRepository;
 import de.ralfhergert.telemetry.repository.Repository;
 import de.ralfhergert.telemetry.repository.RepositoryConnector;
+import de.ralfhergert.telemetry.util.ImageBuilder;
 
 import javax.swing.*;
 import java.util.List;
@@ -99,6 +100,7 @@ public class MultiGraphCanvas extends JPanel implements Scrollable {
 			graphCanvas.getGraphs().forEach((lineGraph) -> {
 				lineGraphsNotShown.remove(lineGraph);
 				JMenu graphMenu = new JMenu(String.valueOf(lineGraph.getProperty("name", "no name")));
+				graphMenu.setIcon(new ImageIcon(ImageBuilder.createSingleColoredImage(10, 10, lineGraph.getProperty("color", Color.WHITE))));
 				graphMenu.add(new JMenuItem(new RemoveLineGraphFromGraphCanvasAction(lineGraph, graphCanvas).withCaption(ResourceBundle.getBundle("messages").getString("generic.remove"))));
 				graphMenu.add(new JMenuItem(new ChangeLineGraphColorAction(this, lineGraph)));
 				popupMenu.add(graphMenu);

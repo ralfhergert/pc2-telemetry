@@ -2,8 +2,10 @@ package de.ralfhergert.telemetry.action;
 
 import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.gui.GraphCanvas;
+import de.ralfhergert.telemetry.util.ImageBuilder;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -15,6 +17,7 @@ public class AddLineGraphToGraphCanvasAction extends AbstractAction {
 	private final GraphCanvas graphCanvas;
 
 	public AddLineGraphToGraphCanvasAction(LineGraph lineGraph, GraphCanvas graphCanvas) {
+		super((String)lineGraph.getProperty("name", "unnamed"), new ImageIcon(ImageBuilder.createSingleColoredImage(10, 10, (Color)lineGraph.getProperty("color", Color.WHITE))));
 		this.lineGraph = lineGraph;
 		this.graphCanvas = graphCanvas;
 	}
