@@ -3,8 +3,7 @@ package de.ralfhergert.telemetry.gui;
 import de.ralfhergert.telemetry.graph.LineGraph;
 import de.ralfhergert.telemetry.graph.LineGraphListener;
 
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 	private final List<LineGraph<Item, Key,Value>> graphs = new ArrayList<>();
 
 	private Color zeroLineColor = new Color(1f, 1f, 1f, 0.3f);
+	private Point currentMousePosition = null;
 
 	public GraphCanvas() {
 		addMouseWheelListener(new MouseWheelListener() {
@@ -34,6 +34,23 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 					xScale *= Math.pow(1.5, e.getWheelRotation());
 					revalidate();
 				}
+			}
+		});
+		addMouseMotionListener(new MouseMotionListener() {
+			@Override
+			public void mouseDragged(MouseEvent e) {}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				currentMousePosition = e.getPoint();
+				repaint();
+			}
+		});
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseExited(MouseEvent e) {
+				currentMousePosition = null;
+				repaint();
 			}
 		});
 	}
@@ -87,6 +104,11 @@ public class GraphCanvas<Item, Key extends Number,Value extends Number> extends 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setBackground(Color.BLACK);
 		g.clearRect(0, 0, getWidth(), getHeight());
+
+		if (currentMousePosition != null) {
+			g.setColor(Color.DARK_GRAY);
+			g.drawOval((int)currentMousePosition.getX() - 5, (int)currentMousePosition.getY() - 5, 10, 10);
+		}
 
 		final Rectangle2D pathBounds = calcCombinedPathBounds();
 		if (pathBounds.getWidth() == 0 || pathBounds.getHeight() == 0) {
