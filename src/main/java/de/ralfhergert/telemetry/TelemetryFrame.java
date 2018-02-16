@@ -25,13 +25,13 @@ public class TelemetryFrame extends JFrame {
 
 		JMenuBar mainMenu = new JMenuBar();
 		{ // create the file menu
-			JMenu fileMenu = new JMenu(ResourceBundle.getBundle("messages").getString("mainMenu.file.caption"));
-			fileMenu.add(new LoadCurrentRepositoryAction(application, this));
-			fileMenu.add(new SaveCurrentRepositoryAction(application, this));
-			fileMenu.addSeparator();
-			fileMenu.add(new StartCapturingAction(application));
-			fileMenu.add(new StopCapturingAction(application));
-			mainMenu.add(fileMenu);
+			JMenu dataMenu = new JMenu(ResourceBundle.getBundle("messages").getString("mainMenu.data.caption"));
+			dataMenu.add(new LoadCurrentRepositoryAction(application, this));
+			dataMenu.add(new SaveCurrentRepositoryAction(application, this));
+			dataMenu.addSeparator();
+			dataMenu.add(new StartCapturingAction(application));
+			dataMenu.add(new StopCapturingAction(application));
+			mainMenu.add(dataMenu);
 		}
 		{ // create the help menu
 			JMenu helpMenu = new JMenu(ResourceBundle.getBundle("messages").getString("mainMenu.help.caption"));
