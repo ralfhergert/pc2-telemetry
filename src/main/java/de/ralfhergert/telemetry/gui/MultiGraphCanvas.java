@@ -107,6 +107,7 @@ public class MultiGraphCanvas extends JPanel implements Scrollable {
 				popupMenu.add(new JPopupMenu.Separator());
 				lineGraphsNotShown.sort((g1, g2) -> ((String) g2.getProperty("name", "no name")).compareTo((String) g1.getProperty("name", "no name")));
 				JMenu graphMenu = new JMenu(ResourceBundle.getBundle("messages").getString("multiGraphCanvas.action.addLineGraphToCanvas"));
+				graphMenu.getPopupMenu().setLayout(new GridLayout(50, 0));
 				lineGraphsNotShown.forEach((lineGraph) -> {
 					graphMenu.add(new JMenuItem(new AddLineGraphToGraphCanvasAction(lineGraph, graphCanvas).withCaption(String.valueOf(lineGraph.getProperty("name", "no name")))));
 				});
