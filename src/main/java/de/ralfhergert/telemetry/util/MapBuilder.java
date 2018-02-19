@@ -15,6 +15,9 @@ public class MapBuilder<Key, Value> {
 	}
 
 	public MapBuilder(Map<Key, Value> map) {
+		if (map == null) {
+			throw new IllegalArgumentException("map can not be null");
+		}
 		this.map = map;
 	}
 
