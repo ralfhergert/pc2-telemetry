@@ -1,5 +1,6 @@
 # pc2-telemetry
 [![Build Status](https://travis-ci.org/ralfhergert/pc2-telemetry.svg?branch=master)](https://travis-ci.org/ralfhergert/pc2-telemetry)
+[![Coverage Status](https://coveralls.io/repos/github/ralfhergert/pc2-telemetry/badge.svg?branch=master)](https://coveralls.io/github/ralfhergert/pc2-telemetry?branch=master)
 
 Telemetry analysis tool for Project Cars 2. It captures the telemetry data Project Cars 2 is sending via UDP.
 The data can be analyzed or stored in a file for exchange or offline analysis sessions.
