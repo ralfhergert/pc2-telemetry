@@ -1,8 +1,10 @@
 package de.ralfhergert.telemetry.util;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This message formatter allows to use messages with placeholders in it.
@@ -35,11 +37,14 @@ public class MessageFormatter {
 	 * found placeholder the map is used to replace it with a value.
 	 */
 	public String format(final String message, Map<String,?> values) {
-		if (values == null || values.isEmpty()) {
+		if (message == null || message.isEmpty() || values == null || values.isEmpty()) {
 			return message;
 		}
+		// build an en-quoted set of the given keys.
+		final Set<String> quotedKeys = values.keySet().stream().map(Pattern::quote).collect(Collectors.toSet());
+
 		// search for all placeholders in the given template and replace them. - This matcher allows only to take action for found placeholders.
-		final Matcher matcher = Pattern.compile(Pattern.quote(delimiterStart) + "(" + String.join("|", values.keySet()) + ")" + Pattern.quote(delimiterEnd)).matcher(message);
+		final Matcher matcher = Pattern.compile(Pattern.quote(delimiterStart) + "(" + String.join("|", quotedKeys) + ")" + Pattern.quote(delimiterEnd)).matcher(message);
 
 		StringBuffer sb = new StringBuffer();
 		while (matcher.find()) {
