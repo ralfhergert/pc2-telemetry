@@ -1,4 +1,10 @@
 language: java
 
+jdk:
+ - oraclejdk8
+
 script:
  - gradle build
+
+after_success:
+ - gradle coveralls
