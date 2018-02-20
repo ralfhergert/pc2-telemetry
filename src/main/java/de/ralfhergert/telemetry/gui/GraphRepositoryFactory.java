@@ -11,9 +11,6 @@ import de.ralfhergert.telemetry.repository.Repository;
 
 import java.awt.Color;
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -33,17 +30,7 @@ public class GraphRepositoryFactory {
 	public Repository<LineGraph> createLineGraphs(IndexedRepository<CarPhysicsPacket> carPhysicRepository, NegativeOffsetAccessor<CarPhysicsPacket, ? extends Number> keyAccessor, CarPhysicsPacket sampleItem) {
 		final Repository<LineGraph> graphRepository = new ItemRepository<>();
 
-		final List<PropertyInfo<CarPhysicsPacket,?>> propertyInfoList = new ArrayList<>();
-		// use reflection to iterate over all fields and compare them.
-		for (Field field : CarPhysicsPacket.class.getFields()) {
-			propertyInfoList.add(new PropertyInfo<>(field.getName(), field.getType(), new FieldAccessor<>(field)));
-		}
-		for (Method method : CarPhysicsPacket.class.getMethods()) {
-			if (method.getName().startsWith("get")) {
-				final String propertyName = convertFirstCharacterToLowerCase(method.getName().substring(3));
-				propertyInfoList.add(new PropertyInfo<>(propertyName, method.getReturnType(), new MethodAccessor<>(method)));
-			}
-		}
+		final List<PropertyInfo<CarPhysicsPacket,?>> propertyInfoList = PropertyInspector.inspect(CarPhysicsPacket.class);
 		for (PropertyInfo<CarPhysicsPacket,?> propertyInfo : propertyInfoList) {
 			if (propertyInfo.getPropertyType().isArray()) {
 				if (!isNumber(propertyInfo.getPropertyType().getComponentType())) {
@@ -95,13 +82,6 @@ public class GraphRepositoryFactory {
 		} else {
 			throw new IllegalArgumentException("no array accessor available for " + type);
 		}
-	}
-
-	public static String convertFirstCharacterToLowerCase(String text) {
-		if (text == null || text.isEmpty()) {
-			return text;
-		}
-		return text.substring(0, 1).toLowerCase() + text.substring(1);
 	}
 
 	public static boolean isNumber(Class clazz) {
