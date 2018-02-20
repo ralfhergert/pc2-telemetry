@@ -69,4 +69,19 @@ public class PropertyInspectorTest {
 		// test the found accessor.
 		Assert.assertEquals("value should be correctly retrieved", 42, info.get(0).getPropertyAccessor().getValue(new A()));
 	}
+
+	@Test
+	public void testConvertingNullString() {
+		Assert.assertEquals("resulting string should be", null, PropertyInspector.convertFirstCharacterToLowerCase(null));
+	}
+
+	@Test
+	public void testConvertingEmptyString() {
+		Assert.assertEquals("resulting string should be", "", PropertyInspector.convertFirstCharacterToLowerCase(""));
+	}
+
+	@Test
+	public void testConvertingExampleString() {
+		Assert.assertEquals("resulting string should be", "aBC", PropertyInspector.convertFirstCharacterToLowerCase("ABC"));
+	}
 }

@@ -34,10 +34,9 @@ public class PropertyValue<Type> {
 	}
 
 	public PropertyValue<Type> removeListener(PropertyValueListener<Type> listener) {
-		if (listener == null) {
-			throw new IllegalArgumentException("listener can not be null");
+		if (listeners.contains(listener)) {
+			listeners.remove(listener);
 		}
-		listeners.remove(listener);
 		return this;
 	}
 
@@ -45,11 +44,12 @@ public class PropertyValue<Type> {
 		return value;
 	}
 
-	public void setValue(Type value) {
+	public PropertyValue<Type> setValue(Type value) {
 		if (comparator == null || comparator.compare(this.value, value) != 0) {
 			Type oldValue = this.value;
 			this.value = value;
 			listeners.forEach(listener -> listener.valueChanged(this, oldValue, value));
 		}
+		return this;
 	}
 }
