@@ -10,6 +10,14 @@ public class NotificationListenerRemoving implements Notification {
 		this.listener = listener;
 	}
 
+	public NotificationCache getCache() {
+		return cache;
+	}
+
+	public NotificationListener getListener() {
+		return listener;
+	}
+
 	@Override
 	public String toString() {
 		return "NotificationListenerRemoving{" +

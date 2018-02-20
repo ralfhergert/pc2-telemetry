@@ -39,7 +39,10 @@ public class NotificationCache {
 		return this;
 	}
 
-	public Notification getLastNotification(Notification notification) {
-		return lastNotifications.get(notification.getClass());
+	public Notification getLastNotification(final Class<? extends Notification> notificationClass) {
+		if (notificationClass == null) {
+			throw new IllegalArgumentException("notification class can not be null");
+		}
+		return lastNotifications.get(notificationClass);
 	}
 }
