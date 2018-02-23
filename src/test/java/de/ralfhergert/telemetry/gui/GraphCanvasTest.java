@@ -26,14 +26,14 @@ public class GraphCanvasTest {
 		Assert.assertEquals("canvas should be the listener", canvas, graph.getListeners().get(0));
 	}
 
+	/**
+	 * This test does not retest whether the canvas registers itself correctly as a listener,
+	 * because this is already tested by {@link #testOnAddingGraphTheGraphCanvasRegistersItselfAsListener()}
+	 */
 	@Test
 	public void testOnRemovingGraphTheGraphCanvasUnregistersItselfAsListener() {
 		LineGraph<Object,Integer,Integer> graph = new LineGraph<>(new IndexedRepository<>(null), (t,o) -> null, (o) -> null);
 		GraphCanvas<Object,Integer,Integer> canvas = new GraphCanvas<Object,Integer,Integer>().addGraph(graph);
-		/**
-		 * This test does not retest whether the canvas registers itself correctly as a listener,
-		 * because this is already tested by {@link testOnAddingGraphTheGraphCanvasRegistersItselfAsListener()}
-		 */
 		canvas.removeGraph(graph);
 		Assert.assertEquals("number of graphs in the canvas", 0, canvas.getGraphs().size());
 		Assert.assertEquals("number of listeners on the graph", 0, graph.getListeners().size());
