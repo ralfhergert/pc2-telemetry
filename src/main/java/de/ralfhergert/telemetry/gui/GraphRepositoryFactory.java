@@ -42,7 +42,7 @@ public class GraphRepositoryFactory {
 				for (int i = 0; i < length; i++) {
 					final String graphName = "carPhysicsPacket.property." + propertyInfo.getPropertyName() + "[" + i + "]";
 					graphRepository.addItem(
-						new LineGraph<>(carPhysicRepository, keyAccessor, getArrayAccessor(propertyInfo.getPropertyType(), propertyInfo.getPropertyAccessor(), i))
+						new LineGraph<>(carPhysicRepository, keyAccessor, new ArrayAccessor<>(i, propertyInfo.getPropertyAccessor()))
 							.setProperty("name", graphName)
 							.setProperty("color", graphColors.containsKey(graphName) ? decode(graphColors.getString(graphName)) : Color.LIGHT_GRAY)
 					);
@@ -67,21 +67,6 @@ public class GraphRepositoryFactory {
 			}
 		}
 		return graphRepository;
-	}
-
-	private <Item> Accessor<Item, ? extends Number> getArrayAccessor(Class type, Accessor<Item, ?> accessor, int index) {
-		if (!type.isArray()) {
-			throw new IllegalArgumentException("given type is not an array: " + type);
-		}
-		if (byte[].class.equals(type)) {
-			return new ByteArrayAccessor<>(index, (Accessor<Item, byte[]>)accessor);
-		} else if (short[].class.equals(type)) {
-			return new ShortArrayAccessor<>(index, (Accessor<Item, short[]>)accessor);
-		} else if (float[].class.equals(type)) {
-			return new FloatArrayAccessor<>(index, (Accessor<Item, float[]>)accessor);
-		} else {
-			throw new IllegalArgumentException("no array accessor available for " + type);
-		}
 	}
 
 	public static boolean isNumber(Class clazz) {
