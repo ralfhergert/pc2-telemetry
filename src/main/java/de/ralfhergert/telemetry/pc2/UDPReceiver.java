@@ -6,7 +6,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 
 /**
- * Receives UDP packet from Project Cars 2.
+ * Receives UDP packets and pushes them to connected listeners.
  */
 public class UDPReceiver implements Runnable {
 
