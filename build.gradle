@@ -28,10 +28,10 @@ targetCompatibility = 1.8
 mainClassName = 'de.ralfhergert.telemetry.Telemetry'
 
 dependencies {
-	compile "org.slf4j:slf4j-api:1.7.+"
-	runtime "org.slf4j:slf4j-simple:1.7.+"
+	compile 'org.slf4j:slf4j-api:1.7.+'
+	runtime 'org.slf4j:slf4j-simple:1.7.+'
 
-	testCompile "junit:junit:4.12"
+	testCompile 'junit:junit:4.12'
 }
 
 def detectCurrentRevision() {
@@ -50,7 +50,7 @@ jar {
 }
 
 jacoco {
-	toolVersion = "0.8.0"
+	toolVersion = '0.8.0'
 }
 
 jacocoTestReport {
