@@ -7,7 +7,6 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath 'gradle.plugin.com.palantir:jacoco-coverage:0.4.0'
 		classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
 	}
 }
@@ -16,7 +15,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'application'
-apply plugin: 'com.palantir.jacoco-coverage'
+apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 
 repositories {
@@ -47,5 +46,11 @@ jar {
 			'Implementation-Title': 'Racing Telemetry for Project Cars 2',
 			'Implementation-Version': detectCurrentRevision()
 		)
+	}
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
 	}
 }
