@@ -10,6 +10,8 @@ import java.util.List;
  */
 public class PropertyInspector {
 
+	private PropertyInspector() { /* no need to instantiate */ }
+
 	/**
 	 * This method creates a set of propertyInfo for the given {@param clazz}.
 	 */
