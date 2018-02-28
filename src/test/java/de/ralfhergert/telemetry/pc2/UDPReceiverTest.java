@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Arrays;
 
 /**
  * This test ensures that the {@link UDPReceiver} is working correctly.
@@ -47,13 +48,7 @@ public class UDPReceiverTest {
 	public void testReceiverStopsWhenSocketSendsASocketException() throws SocketException {
 		final StoringUDPListener listener = new StoringUDPListener();
 		// create a socket which fires a SocketException when trying to read from.
-		final MockDatagramSocket mockDatagramSocket = new MockDatagramSocket() {
-			@Override
-			public synchronized void receive(DatagramPacket p) throws IOException {
-				super.receive(p);
-				throw new SocketException();
-			}
-		};
+		final MockDatagramSocket mockDatagramSocket = new MockDatagramSocket();
 		final UDPReceiver receiver = new UDPReceiver(mockDatagramSocket, listener);
 		Assert.assertTrue("receiver should be runnable", receiver.isRunning());
 		// try to run the receiver in a thread.
@@ -74,15 +69,8 @@ public class UDPReceiverTest {
 	public void testReceiverForwardsPacketsToListener() throws SocketException {
 		final StoringUDPListener listener = new StoringUDPListener();
 		// create a socket which fires a SocketException when trying to read from.
-		final MockDatagramSocket mockDatagramSocket = new MockDatagramSocket() {
-			@Override
-			public synchronized void receive(DatagramPacket p) throws IOException {
-				super.receive(p);
-				if (getReceiveCalled() > 3) { // throw an exception if this is the fourth call
-					throw new SocketException();
-				}
-			}
-		};
+		final MockDatagramSocket mockDatagramSocket = new MockDatagramSocket()
+			.addData(Arrays.asList(new byte[1], new byte[1], new byte[1]));
 		final UDPReceiver receiver = new UDPReceiver(mockDatagramSocket, listener);
 		Assert.assertTrue("receiver should be runnable", receiver.isRunning());
 		// try to run the receiver in a thread.
@@ -106,12 +94,8 @@ public class UDPReceiverTest {
 		final MockDatagramSocket mockDatagramSocket = new MockDatagramSocket() {
 			@Override
 			public synchronized void receive(DatagramPacket p) throws IOException {
-				super.receive(p);
-				if (getReceiveCalled() > 3) { // throw an exception if this is the fourth call
-					throw new SocketException();
-				} else {
-					throw new IOException(); // throw always an IOException
-				}
+				receiveCalled++;
+				throw new IOException(); // throw always an IOException
 			}
 		};
 		final UDPReceiver receiver = new UDPReceiver(mockDatagramSocket, listener);

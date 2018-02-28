@@ -7,6 +7,7 @@ import de.ralfhergert.telemetry.repository.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.DatatypeConverter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
@@ -22,6 +23,7 @@ public class UDPCaptureThread {
 	private DatagramSocket socket;
 	private Repository<CarPhysicsPacket> carPhysicsPacketRepository;
 	private UDPReceiver udpReceiver;
+	private Thread thread = null;
 
 	public UDPCaptureThread(final DatagramSocket socket, Repository<CarPhysicsPacket> carPhysicsPacketRepository) {
 		if (socket == null) {
@@ -40,14 +42,14 @@ public class UDPCaptureThread {
 			public void received(DatagramPacket packet) {
 				BasePacket basePacket = parser.parse(packet);
 				if (basePacket == null) {
-					logger.info("Received unknown message: {}", new BasePacket(packet.getData()));
+					logger.info("Received unknown message: {}", "0x" + DatatypeConverter.printHexBinary(packet.getData()));
 				} else if (basePacket instanceof CarPhysicsPacket) {
-					CarPhysicsPacket carPhysicsPacket = (CarPhysicsPacket) basePacket;
-					carPhysicsPacketRepository.addItem(carPhysicsPacket);
+					carPhysicsPacketRepository.addItem((CarPhysicsPacket)basePacket);
 				}
 			}
 		});
-		new Thread(udpReceiver).start();
+		thread = new Thread(udpReceiver);
+		thread.start();
 		return this;
 	}
 
@@ -62,12 +64,9 @@ public class UDPCaptureThread {
 		return this;
 	}
 
-	public Repository<CarPhysicsPacket> getCarPhysicsPacketRepository() {
-		return carPhysicsPacketRepository;
-	}
-
-	public UDPCaptureThread setCarPhysicsPacketRepository(Repository<CarPhysicsPacket> carPhysicsPacketRepository) {
-		this.carPhysicsPacketRepository = carPhysicsPacketRepository;
-		return this;
+	public void join() throws InterruptedException {
+		if (thread != null && thread.isAlive()) {
+			thread.join();
+		}
 	}
 }
