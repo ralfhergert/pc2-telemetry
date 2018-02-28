@@ -16,6 +16,12 @@ public class UDPReceiver implements Runnable {
 	private boolean running = true;
 
 	public UDPReceiver(DatagramSocket socket, UDPListener listener) {
+		if (socket == null) {
+			throw new IllegalArgumentException("socket can not be null");
+		}
+		if (listener == null) {
+			throw new IllegalArgumentException("listener can not be null");
+		}
 		this.socket = socket;
 		this.listener = listener;
 	}
@@ -33,6 +39,7 @@ public class UDPReceiver implements Runnable {
 				running = false;
 				return;
 			} catch (IOException e) {
+				running = false;
 				break;
 			}
 		}
