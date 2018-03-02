@@ -24,7 +24,18 @@ public class PropertyValueTest {
 		new PropertyValue<>(0)
 			.addListener(listener)
 			.setValue(0); // set the value again to 0 -an event should have been fired
-		Assert.assertEquals("number of events fired", 1, listener.getEvents().size());
+		Assert.assertEquals("number of events received", 1, listener.getEvents().size());
+	}
+
+	@Test
+	public void testAddingSameListenerASecondTimeIsIgnored() {
+		final StoringPropertyValueListener<Integer> listener = new StoringPropertyValueListener<>();
+		new PropertyValue<>(0)
+			.addListener(listener)
+			.addListener(listener) // try to add the same listener again
+			.setValue(1);
+		// confirm the listener received only one event.
+		Assert.assertEquals("number of events received", 1, listener.getEvents().size());
 	}
 
 	@Test

@@ -15,14 +15,18 @@ public class PropertyValues {
 	 * If this property does not yet exist, it will be created.
 	 */
 	public <Type> PropertyValues addListener(String propertyName, PropertyValueListener<Type> listener) {
+		if (propertyName == null) {
+			throw new IllegalArgumentException("propertyName can not be null");
+		}
+		if (listener == null) {
+			throw new IllegalArgumentException("listener can not be null");
+		}
 		PropertyValue<Type> propertyValue = (PropertyValue<Type>)propertyValueMap.get(propertyName);
 		if (propertyValue == null) {
 			propertyValue = new PropertyValue<>(null);
 			propertyValueMap.put(propertyName, propertyValue);
 		}
-		if (listener != null) {
-			propertyValue.addListener(listener);
-		}
+		propertyValue.addListener(listener);
 		return this;
 	}
 
