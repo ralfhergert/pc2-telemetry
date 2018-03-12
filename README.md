@@ -10,7 +10,7 @@ PC2-Telemetry is a Java Application, so make sure you have a JavaRuntimeEnvironm
 You can get [Java free from Oracle](https://java.com). Download the latest release pc2-telemetry.jar. Start the application
 by double-clicking the JarFile.
 
-Start Project Cars 2. Make sure that in Project Cars' system options. Sending UDP-packets in version 2 is active.
+Start Project Cars 2. Make sure that in Project Cars' system options *Sending UDP-packets in version 2* is active.
 As soon as you are driving on a track PC2-Telemetry should start receiving and rendering the data in real-time.
 
 # Features
