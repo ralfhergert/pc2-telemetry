@@ -110,8 +110,8 @@ public class Telemetry {
 	}
 
 	/**
-	 * This method will either return the current socket, if it is still connected.
-	 * Or else it try to create a new socket. This might fail due to resource conflicts.
+	 * This method will either return the current socket, if it is still connected, or
+	 * else it tries to create a new socket. Which might fail due to resource conflicts.
 	 */
 	public DatagramSocket createSocket() throws SocketException {
 		if (socket != null && socket.isConnected()) {
